@@ -85,31 +85,39 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\CreateCylinder.cpp
+SOURCE=.\create_cylinder.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\HexCell.cpp
+SOURCE=.\hs_cell.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\HexEdge.cpp
+SOURCE=.\hs_edge.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\HexFace.cpp
+SOURCE=.\hs_face.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\HexModel.cpp
+SOURCE=.\hs_model.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\HexVertex.cpp
+SOURCE=.\hs_point.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\InitACIS.cpp
+SOURCE=.\hs_subdiv.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\hs_vert.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\init_acis.cpp
 # End Source File
 # Begin Source File
 
@@ -117,15 +125,7 @@ SOURCE=.\main.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\Point3D.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\SaveSATFile.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\Subdivision.cpp
+SOURCE=.\save_sat_file.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -137,39 +137,39 @@ SOURCE=.\GlobalDef.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\HexCell.h
+SOURCE=.\hex_subdiv.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\HexEdge.h
+SOURCE=.\hs_cell.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\HexFace.h
+SOURCE=.\hs_edge.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\HexModel.h
+SOURCE=.\hs_face.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\HexVarDef.h
+SOURCE=.\hs_model.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\HexVertex.h
+SOURCE=.\hs_point.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\InitACIS.h
+SOURCE=.\hs_subdiv.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Point3D.h
+SOURCE=.\hs_vert.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Subdivision.h
+SOURCE=.\init_acis.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

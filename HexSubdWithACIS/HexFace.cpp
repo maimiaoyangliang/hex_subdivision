@@ -1,27 +1,27 @@
 #include "HexFace.h"
 
-namespace HexMesh {
+namespace hex_subdiv {
 	
-	HexFace::HexFace() {
-		cellIndices[0] = cellIndices[1] = -1;
+	hs_face::hs_face() {
+		cell_idx[0] = cell_idx[1] = -1;
 		_acis_face = NULL;
 	}
 	
-	HexFace::HexFace(const HexFace& f) {
-		vertexIndices = f.vertexIndices;
-		edgeIndices   = f.edgeIndices;
-		cellIndices[0] = f.cellIndices[0];
-		cellIndices[1] = f.cellIndices[1];
+	hs_face::hs_face(const hs_face& f) {
+		vert_idx = f.vert_idx;
+		edge_idx   = f.edge_idx;
+		cell_idx[0] = f.cell_idx[0];
+		cell_idx[1] = f.cell_idx[1];
 		_acis_face = f._acis_face;
 	}
 	
-	HexFace& HexFace::operator= (const HexFace& f) {
+	hs_face& hs_face::operator= (const hs_face& f) {
 		if (this == &f)
 			return *this;
-		vertexIndices = f.vertexIndices;
-		edgeIndices   = f.edgeIndices;
-		cellIndices[0] = f.cellIndices[0];
-		cellIndices[1] = f.cellIndices[1];
+		vert_idx = f.vert_idx;
+		edge_idx   = f.edge_idx;
+		cell_idx[0] = f.cell_idx[0];
+		cell_idx[1] = f.cell_idx[1];
 		_acis_face = f._acis_face;
 		
 		return *this;

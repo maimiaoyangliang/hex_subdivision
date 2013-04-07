@@ -5,43 +5,44 @@
 	
 class EDGE;
 
-namespace HexMesh {
+namespace hex_subdiv {
 	
 
 
-	class HexEdge {
+	class hs_edge {
 	public:
-		HexEdge();
-		HexEdge(const HexEdge&);
-		HexEdge& operator= (const HexEdge&);
+		hs_edge();
+		hs_edge(const hs_edge&);
+		hs_edge& operator= (const hs_edge&);
 		
-		virtual ~HexEdge(){}
+		virtual ~hs_edge(){}
 
-		void add_face(size_t ind) { faceIndices.insert(ind); }
-		void add_cell(size_t ind) { cellIndices.insert(ind); }
+		void add_face(size_t idx) { face_idx.insert(idx); }
+		void add_cell(size_t idx) { cell_idx.insert(idx); }
 		
 		void set_acis_edge(EDGE* acis_edge) { _acis_edge = acis_edge; }
-		void set_start_vert(size_t v) { vertexIndices[0] = v; }
-		void set_end_vert(size_t v) { vertexIndices[1] = v; }
+		void set_start_vert(size_t v) { vert_idx[0] = v; }
+		void set_end_vert(size_t v) { vert_idx[1] = v; }
 
-		size_t start_vert() const { return vertexIndices[0]; }
-		size_t end_vert() const { return vertexIndices[1]; }
+		size_t start_vert() const { return vert_idx[0]; }
+		size_t end_vert() const { return vert_idx[1]; }
 
-		int_set_iter first_face()  { return faceIndices.begin(); }
-		int_set_iter end_face()  { return faceIndices.end(); }
-		size_t face_size() const { return faceIndices.size(); }
+		int_set_iter first_face()  { return face_idx.begin(); }
+		int_set_iter first_cell()  { return cell_idx.begin(); }
 
-		int_set_iter first_cell()  { return cellIndices.begin(); }
-		int_set_iter end_cell()  { return cellIndices.end(); }
-		size_t cell_size() const { return cellIndices.size(); }
+		int_set_iter end_face()  { return face_idx.end(); }
+		int_set_iter end_cell()  { return cell_idx.end(); }
+
+		size_t face_size() const { return face_idx.size(); }
+		size_t cell_size() const { return cell_idx.size(); }
 
 		EDGE* acis_edge() const { return _acis_edge; }
 
 		
 	private:
-		int_set faceIndices;
-		int_set cellIndices;
-		size_t  vertexIndices[2];
+		int_set face_idx;
+		int_set cell_idx;
+		size_t  vert_idx[2];
 		EDGE*   _acis_edge;
 		
 	};

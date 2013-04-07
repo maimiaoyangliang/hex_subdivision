@@ -1,27 +1,27 @@
 #include "HexVertex.h"
 
-namespace HexMesh {
+namespace hex_subdiv {
 	
-	HexVertex::HexVertex() : coordinate() {}
+	hs_vert::hs_vert() : coordinate() {}
 	
-	HexVertex::HexVertex(const Point3D& p) : coordinate(p) {}
+	hs_vert::hs_vert(const hs_point& p) : coordinate(p) {}
 	
-	HexVertex::HexVertex(double x, double y, double z) : coordinate(x,y,z) {}
+	hs_vert::hs_vert(double x, double y, double z) : coordinate(x,y,z) {}
 	
-	HexVertex::HexVertex(const HexVertex& v)
+	hs_vert::hs_vert(const hs_vert& v)
 		: coordinate(v.coordinate)
-		, edgeIndices(v.edgeIndices)
-		, faceIndices(v.faceIndices)
-		, cellIndices(v.cellIndices) {}
+		, edge_idx(v.edge_idx)
+		, face_idx(v.face_idx)
+		, cell_idx(v.cell_idx) {}
 	
-	HexVertex& HexVertex::operator= (const HexVertex& v) {
+	hs_vert& hs_vert::operator= (const hs_vert& v) {
 		if (this == &v)
 			return (*this);
 		
 		coordinate  = v.coordinate;
-		edgeIndices = v.edgeIndices;
-		faceIndices = v.faceIndices;
-		cellIndices = v.cellIndices;
+		edge_idx = v.edge_idx;
+		face_idx = v.face_idx;
+		cell_idx = v.cell_idx;
 		return (*this);
 	}
 	

@@ -24001,3 +24001,80 @@ Bad delete pointers: 0
 Mismatched caller pointers: 3717
 Stack high-water-mark: 12744 Bytes
 Elapsed seconds: 4.897
+*** Beginning Leak Dump ***
+
+*** Statistics ***
+No leaks
+30002 allocations for 2203471 Bytes
+30002 deletes for 2203471 Bytes
+High-water-mark: 1387002 Bytes
+Bad delete pointers: 0
+Mismatched caller pointers: 3717
+Stack high-water-mark: 12744 Bytes
+Elapsed seconds: 6.501
+*** Beginning Leak Dump ***
+
+*** Statistics ***
+No leaks
+30002 allocations for 2203471 Bytes
+30002 deletes for 2203471 Bytes
+High-water-mark: 1387002 Bytes
+Bad delete pointers: 0
+Mismatched caller pointers: 3717
+Stack high-water-mark: 12744 Bytes
+Elapsed seconds: 3.183
+*** Beginning Leak Dump ***
+
+*** Statistics ***
+No leaks
+30002 allocations for 2203471 Bytes
+30002 deletes for 2203471 Bytes
+High-water-mark: 1387002 Bytes
+Bad delete pointers: 0
+Mismatched caller pointers: 3717
+Stack high-water-mark: 12744 Bytes
+Elapsed seconds: 1.512
+*** Beginning Leak Dump ***
+
+*** Statistics ***
+No leaks
+30002 allocations for 2203471 Bytes
+30002 deletes for 2203471 Bytes
+High-water-mark: 1387002 Bytes
+Bad delete pointers: 0
+Mismatched caller pointers: 3717
+Stack high-water-mark: 12744 Bytes
+Elapsed seconds: 0.721
+*** Beginning Leak Dump ***
+
+*** Statistics ***
+No leaks
+30002 allocations for 2203471 Bytes
+30002 deletes for 2203471 Bytes
+High-water-mark: 1387002 Bytes
+Bad delete pointers: 0
+Mismatched caller pointers: 3717
+Stack high-water-mark: 12744 Bytes
+Elapsed seconds: 0.761
+*** Beginning Leak Dump ***
+
+*** Statistics ***
+No leaks
+30002 allocations for 2203471 Bytes
+30002 deletes for 2203471 Bytes
+High-water-mark: 1387002 Bytes
+Bad delete pointers: 0
+Mismatched caller pointers: 3717
+Stack high-water-mark: 12744 Bytes
+Elapsed seconds: 0.711
+*** Beginning Leak Dump ***
+
+*** Statistics ***
+No leaks
+30781 allocations for 2241031 Bytes
+30781 deletes for 2241031 Bytes
+High-water-mark: 1409810 Bytes
+Bad delete pointers: 0
+Mismatched caller pointers: 3813
+Stack high-water-mark: 12744 Bytes
+Elapsed seconds: 0.741

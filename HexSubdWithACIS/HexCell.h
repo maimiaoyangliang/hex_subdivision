@@ -4,38 +4,39 @@
 #include "HexVarDef.h"
 
 
-namespace HexMesh {
+namespace hex_subdiv {
 	
-	class HexCell {
+	class hs_cell {
 	public:
-		HexCell() {}
-		HexCell(const HexCell&);
-		HexCell& operator= (const HexCell&);
+		hs_cell() {}
+		hs_cell(const hs_cell&);
+		hs_cell& operator= (const hs_cell&);
 		
-		virtual ~HexCell() {}
+		virtual ~hs_cell() {}
 		
-		void add_vert(size_t ind) { vertexIndices.insert(ind); }
-		void add_edge(size_t ind) { edgeIndices.insert(ind); }
-		void add_face(size_t ind) { faceIndices.insert(ind); }
+		void add_vert(size_t idx) { vert_idx.insert(idx); }
+		void add_edge(size_t idx) { edge_idx.insert(idx); }
+		void add_face(size_t idx) { face_idx.insert(idx); }
 		
-		int_set_iter first_vert()  { return vertexIndices.begin(); }
-		int_set_iter end_vert()  { return vertexIndices.end(); }
-		size_t vert_size() const { return vertexIndices.size(); }
+		int_set_iter first_vert()  { return vert_idx.begin(); }
+		int_set_iter first_edge()  { return edge_idx.begin(); }
+		int_set_iter first_face()  { return face_idx.begin(); }
 		
-		int_set_iter first_edge()  { return edgeIndices.begin(); }
-		int_set_iter end_edge()  { return edgeIndices.end(); }
-		size_t edge_size() const { return edgeIndices.size(); }
+		int_set_iter end_vert()  { return vert_idx.end(); }
+		int_set_iter end_edge()  { return edge_idx.end(); }
+		int_set_iter end_face()  { return face_idx.end(); }
 		
-		int_set_iter first_face()  { return faceIndices.begin(); }
-		int_set_iter end_face()  { return faceIndices.end(); }
-		size_t face_size() const { return faceIndices.size(); }
-
-		void clear_all() { vertexIndices.clear(); edgeIndices.clear(); faceIndices.clear(); }
+		size_t vert_size() const { return vert_idx.size(); }
+		size_t edge_size() const { return edge_idx.size(); }
+		size_t face_size() const { return face_idx.size(); }
+		
+		void clear_all() { vert_idx.clear(); edge_idx.clear(); face_idx.clear(); }
+		
 		
 	private:
-		int_set vertexIndices;
-		int_set edgeIndices;
-		int_set faceIndices;
+		int_set vert_idx;
+		int_set edge_idx;
+		int_set face_idx;
 	};
 	
 } // namespace

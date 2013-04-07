@@ -1,45 +1,45 @@
 #ifndef POINT3D_H_
 #define POINT3D_H_
 
-namespace HexMesh {
+namespace hex_subdiv {
 	
-	class Point3D {
+	class hs_point {
 	public:
-		Point3D() : _x(0.0f), _y(0.0f), _z(0.0f) {}
-		Point3D(double x, double y, double z) : _x(x), _y(y), _z(z) {}
-		Point3D(const Point3D & p) : _x(p._x), _y(p._y), _z(p._z) {}
+		hs_point() : _x(0.0f), _y(0.0f), _z(0.0f) {}
+		hs_point(double x, double y, double z) : _x(x), _y(y), _z(z) {}
+		hs_point(const hs_point & p) : _x(p._x), _y(p._y), _z(p._z) {}
 		
-		virtual ~Point3D(){}
+		virtual ~hs_point(){}
 		
 		// operator
-		Point3D& operator=  (const Point3D &);
-		Point3D& operator+= (const Point3D &);
-		Point3D& operator-= (const Point3D &);
-		Point3D& operator*= (double f);
-		Point3D& operator/= (double d);
+		hs_point& operator=  (const hs_point &);
+		hs_point& operator+= (const hs_point &);
+		hs_point& operator-= (const hs_point &);
+		hs_point& operator*= (double f);
+		hs_point& operator/= (double d);
 		
 		double x() const { return _x; }
 		double y() const { return _y; }
 		double z() const { return _z; }
 		
-		double	dot(const Point3D &);
+		double	dot(const hs_point &);
 		double	length();
-		Point3D cross(const Point3D &);
-		Point3D& unify();
 		void	zero();
+		hs_point cross(const hs_point &);
+		hs_point& unify();
 		inline void	print() const;
 		
 	private:
 		double _x, _y, _z;
 	};
 	
-	Point3D operator+ (const Point3D&, const Point3D&);
-	Point3D operator- (const Point3D&, const Point3D&);
+	hs_point operator+ (const hs_point&, const hs_point&);
+	hs_point operator- (const hs_point&, const hs_point&);
 
-	Point3D operator* (const Point3D&, double);
-	Point3D operator* (double, const Point3D&);
+	hs_point operator* (const hs_point&, double);
+	hs_point operator* (double, const hs_point&);
 
-	Point3D operator/ (const Point3D&, double);
+	hs_point operator/ (const hs_point&, double);
 
 	
 } // namespace

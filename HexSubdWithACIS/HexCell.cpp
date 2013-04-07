@@ -1,19 +1,19 @@
 #include "HexCell.h"
 
-namespace HexMesh {
+namespace hex_subdiv {
 	
-	HexCell::HexCell(const HexCell& c) 
-		: vertexIndices(c.vertexIndices)
-		, edgeIndices(c.edgeIndices)
-		, faceIndices(c.faceIndices) {}
+	hs_cell::hs_cell(const hs_cell& c) 
+		: vert_idx(c.vert_idx)
+		, edge_idx(c.edge_idx)
+		, face_idx(c.face_idx) {}
 	
-	HexCell& HexCell::operator= (const HexCell& c) {
+	hs_cell& hs_cell::operator= (const hs_cell& c) {
 		if (this == &c)
 			return *this;
 		
-		vertexIndices = c.vertexIndices;
-		edgeIndices   = c.edgeIndices;
-		faceIndices   = c.faceIndices;
+		vert_idx = c.vert_idx;
+		edge_idx   = c.edge_idx;
+		face_idx   = c.face_idx;
 		
 		return *this;
 	}

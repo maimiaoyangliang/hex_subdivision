@@ -1,27 +1,27 @@
 #include "HexEdge.h"
 
-namespace HexMesh {
+namespace hex_subdiv {
 
-	HexEdge::HexEdge() {
-		vertexIndices[0] = vertexIndices[1] = -1;
+	hs_edge::hs_edge() {
+		vert_idx[0] = vert_idx[1] = -1;
 		_acis_edge = NULL;
 	}
 	
-	HexEdge::HexEdge(const HexEdge& e) {
-		vertexIndices[0] = e.vertexIndices[0];
-		vertexIndices[1] = e.vertexIndices[1];
-		faceIndices = e.faceIndices;
-		cellIndices = e.cellIndices;
+	hs_edge::hs_edge(const hs_edge& e) {
+		vert_idx[0] = e.vert_idx[0];
+		vert_idx[1] = e.vert_idx[1];
+		face_idx = e.face_idx;
+		cell_idx = e.cell_idx;
 		_acis_edge = e._acis_edge;
 	}
 	
-	HexEdge& HexEdge::operator= (const HexEdge& e) {
+	hs_edge& hs_edge::operator= (const hs_edge& e) {
 		if (this == &e)
 			return *this;
-		vertexIndices[0] = e.vertexIndices[0];
-		vertexIndices[1] = e.vertexIndices[1];
-		faceIndices = e.faceIndices;
-		cellIndices = e.cellIndices;
+		vert_idx[0] = e.vert_idx[0];
+		vert_idx[1] = e.vert_idx[1];
+		face_idx = e.face_idx;
+		cell_idx = e.cell_idx;
 		_acis_edge = e._acis_edge;
 		
 		return *this;

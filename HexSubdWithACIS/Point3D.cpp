@@ -5,61 +5,61 @@
 
 #include "Point3D.h"
 
-namespace HexMesh {
+namespace hex_subdiv {
 	
 #define DELTA (1.0e-20)
 	
 	// operator
-	Point3D& Point3D::operator= (const Point3D& p) {
+	hs_point& hs_point::operator= (const hs_point& p) {
 		if (this == &p) return *this;
 		_x = p._x; _y = p._y; _z = p._z;
 		
 		return *this;
 	}
 	
-	Point3D& Point3D::operator+= (const Point3D &p) {
+	hs_point& hs_point::operator+= (const hs_point &p) {
 		_x += p._x; _y += p._y; _z += p._z;
 		return *this;
 	}
 	
-	Point3D& Point3D::operator-= (const Point3D &p) {
+	hs_point& hs_point::operator-= (const hs_point &p) {
 		_x -= p._x; _y -= p._y; _z -= p._z;
 		return *this;
 	}
 	
-	Point3D& Point3D::operator*= (double f){
+	hs_point& hs_point::operator*= (double f){
 		_x *= f; _y *= f; _z *= f;
 		return *this;
 	}
 	
-	Point3D& Point3D::operator/= (double d){
+	hs_point& hs_point::operator/= (double d){
 		assert(d > DELTA || d < -DELTA);
 		_x /= d; _y /= d; _z /= d;
 		return *this;
 	}
 	
-	double Point3D::dot(const Point3D &p){
+	double hs_point::dot(const hs_point &p){
 		return _x * p._x + _y * p._y + _z * p._z;
 	}
 	
-	Point3D Point3D::cross(const Point3D &p){
-		return Point3D(_y*p._z - _z*p._y, _z*p._x - _x*p._z, _x*p._y - _y*p._x);
+	hs_point hs_point::cross(const hs_point &p){
+		return hs_point(_y*p._z - _z*p._y, _z*p._x - _x*p._z, _x*p._y - _y*p._x);
 	}
 	
-	double Point3D::length() {
+	double hs_point::length() {
 		return sqrt(_x * _x + _y * _y + _z * _z);
 	}
 	
-	void Point3D::zero() {
+	void hs_point::zero() {
 		_x = _y = _z = 0.0;
 	}
 	
-	void Point3D::print() const{
+	void hs_point::print() const{
 		std::cout << "[" << _x << ", "
 			<< _y << ", " << _z << "]" << std::endl;
 	}
 
-	Point3D& Point3D::unify() {
+	hs_point& hs_point::unify() {
 		double len = length();
 		assert( len > DELTA );
 		/*if( len < 1.0e-20 ) {
@@ -74,23 +74,23 @@ namespace HexMesh {
 		return *this;
 	}
 
-	Point3D operator+ (const Point3D& p1, const Point3D& p2) {
-		return Point3D(p1.x() + p2.x(), p1.y() + p2.y(), p1.z() + p2.z());
+	hs_point operator+ (const hs_point& p1, const hs_point& p2) {
+		return hs_point(p1.x() + p2.x(), p1.y() + p2.y(), p1.z() + p2.z());
 	}
 
-	Point3D operator- (const Point3D& p1, const Point3D& p2) {
-		return Point3D(p1.x() - p2.x(), p1.y() - p2.y(), p1.z() - p2.z());
+	hs_point operator- (const hs_point& p1, const hs_point& p2) {
+		return hs_point(p1.x() - p2.x(), p1.y() - p2.y(), p1.z() - p2.z());
 	}
 
-	Point3D operator* (const Point3D& p, double d) {
-		return Point3D(p.x() * d, p.y() * d, p.z() * d);
+	hs_point operator* (const hs_point& p, double d) {
+		return hs_point(p.x() * d, p.y() * d, p.z() * d);
 	}
 
-	Point3D operator* (double d, const Point3D& p) {
+	hs_point operator* (double d, const hs_point& p) {
 		return p * d;
 	}
 
-	Point3D operator/ (const Point3D& p, double d) {
+	hs_point operator/ (const hs_point& p, double d) {
 		assert( d > DELTA || d < -DELTA);
 		return p * (1 / d);
 	}

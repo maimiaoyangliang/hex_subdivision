@@ -11,9 +11,9 @@
 #include "cstrapi.hxx"
 #include "lists.hxx"
 
-namespace HexMesh {
+namespace hex_subdiv {
 	
-	HexModel::~HexModel() {
+	hs_model::~hs_model() {
 		vertices.clear();
 		edges.clear();
 		faces.clear();
@@ -21,12 +21,12 @@ namespace HexMesh {
 	}
 
 
-	void HexModel::acis_wire(ENTITY_LIST& elist) {
+	void hs_model::acis_wire(ENTITY_LIST& elist) {
 		
 		edge_vector_iter edge_iter = edges.begin();
 		for (; edge_iter != edges.end(); ++edge_iter) {
-			Point3D& start = vertices[edge_iter->start_vert()].coord();
-			Point3D& end = vertices[edge_iter->end_vert()].coord();
+			hs_point& start = vertices[edge_iter->start_vert()].coord();
+			hs_point& end = vertices[edge_iter->end_vert()].coord();
 			
 			SPAposition spa_start( start.x(), start.y(), start.z() );
 			SPAposition spa_end( end.x(), end.y(), end.z() );
@@ -40,7 +40,7 @@ namespace HexMesh {
 	}
 
 
-	void HexModel::set_acis_edge(EDGE* acis_edge[], size_t size) {
+	void hs_model::set_acis_edge(EDGE* acis_edge[], size_t size) {
 
 		assert( edges.size() == size );
 
@@ -50,7 +50,7 @@ namespace HexMesh {
 		}
 	}
 
-	void HexModel::set_acis_face(FACE* acis_face[], size_t size) {
+	void hs_model::set_acis_face(FACE* acis_face[], size_t size) {
 
 		assert( faces.size() == size );
 
@@ -61,20 +61,20 @@ namespace HexMesh {
 	}
 
 	
-	void HexModel::add_vert(const Point3D& pos) {
-		HexVertex hex_vert(pos.x(), pos.y(), pos.z());
+	void hs_model::add_vert(const hs_point& pos) {
+		hs_vert hex_vert(pos.x(), pos.y(), pos.z());
 		add_vert(hex_vert);
 	}
 	
-	void HexModel::add_edge(size_t sp, size_t ep) {
-		HexEdge hex_edge;
+	void hs_model::add_edge(size_t sp, size_t ep) {
+		hs_edge hex_edge;
 		hex_edge.set_start_vert(sp);
 		hex_edge.set_end_vert(ep);
 		edges.push_back(hex_edge);
 
-		size_t eind = edges.size() - 1;
-		vertices[sp].add_edge(eind);
-		vertices[ep].add_edge(eind);
+		size_t eidx = edges.size() - 1;
+		vertices[sp].add_edge(eidx);
+		vertices[ep].add_edge(eidx);
 	}
 
 /*
@@ -107,24 +107,24 @@ namespace HexMesh {
 	}	
 */
 
-	void HexModel::add_face(const size_t edge_ind[], size_t size) {
-		HexFace hex_face;
+	void hs_model::add_face(const size_t edge_idx[], size_t size) {
+		hs_face hex_face;
 		faces.push_back(hex_face);
 
-		size_t find = faces.size() - 1;
-		int_set vert_in_edge;
+		size_t fidx = faces.size() - 1;
+		int_set vert_of_edge;
 		
 		for (size_t i = 0; i < size; ++i) {
-			face(find).add_edge(edge_ind[i]);
-			edge(edge_ind[i]).add_face(find);
-			vert_in_edge.insert(edge(edge_ind[i]).start_vert());
-			vert_in_edge.insert(edge(edge_ind[i]).end_vert());
+			face_at(fidx).add_edge(edge_idx[i]);
+			edge_at(edge_idx[i]).add_face(fidx);
+			vert_of_edge.insert(edge_at(edge_idx[i]).start_vert());
+			vert_of_edge.insert(edge_at(edge_idx[i]).end_vert());
 		}
 		
-		int_set_iter iter = vert_in_edge.begin();
-		for(; iter != vert_in_edge.end(); ++iter) {
-			face(find).add_vert(*iter);
-			vertex(*iter).add_face(find);
+		int_set_iter iter = vert_of_edge.begin();
+		for(; iter != vert_of_edge.end(); ++iter) {
+			face_at(fidx).add_vert(*iter);
+			vert_at(*iter).add_face(fidx);
 		}
 	}
 	
@@ -160,45 +160,45 @@ namespace HexMesh {
 */
 	
 	
-	void HexModel::add_cell(const size_t face_ind[],
-		size_t size
+	void hs_model::add_cell(const size_t fidx[],
+		size_t fsz
 		) {
 		
-		HexMesh::HexCell hex_cell;
-		int_set vert_in_cell;
-		int_set edge_in_cell;
+		hs_cell hex_cell;
+		int_set vert_of_cell;
+		int_set edge_of_cell;
 		
-		size_t ind = cell_size();
-		for (size_t i = 0; i < size; ++i) {
-			hex_cell.add_face(face_ind[i]);
-			if ( -1 == face(face_ind[i]).fst_cell()) {
-				face(face_ind[i]).set_fst_cell(ind);
-			} else if ( -1 == face(face_ind[i]).snd_cell()) {
-				face(face_ind[i]).set_snd_cell(ind);
+		size_t csz = cell_size();
+		for (size_t i = 0; i < fsz; ++i) {
+			hex_cell.add_face(fidx[i]);
+			if ( -1 == face_at(fidx[i]).fst_cell()) {
+				face_at(fidx[i]).set_fst_cell(csz);
+			} else if ( -1 == face_at(fidx[i]).snd_cell()) {
+				face_at(fidx[i]).set_snd_cell(csz);
 			} else {
 				std::cerr << "Error in add_hex_cell." << std::endl;
 				return;
 			}
 			
-			int_set_iter iter_vert = face(face_ind[i]).first_vert();
-			for(; iter_vert != face(face_ind[i]).end_vert(); ++iter_vert) {
-				vert_in_cell.insert(*iter_vert);
+			int_set_iter iter_vert = face_at(fidx[i]).first_vert();
+			for(; iter_vert != face_at(fidx[i]).end_vert(); ++iter_vert) {
+				vert_of_cell.insert(*iter_vert);
 			}
 			
-			int_set_iter iter_edge = face(face_ind[i]).first_edge();
-			for(; iter_edge != face(face_ind[i]).end_edge(); ++iter_edge) {
-				edge_in_cell.insert(*iter_edge);
+			int_set_iter iter_edge = face_at(fidx[i]).first_edge();
+			for(; iter_edge != face_at(fidx[i]).end_edge(); ++iter_edge) {
+				edge_of_cell.insert(*iter_edge);
 			}
 		}
 		
 		int_set_iter iter;
-		for (iter = vert_in_cell.begin(); iter != vert_in_cell.end(); ++iter) {
+		for (iter = vert_of_cell.begin(); iter != vert_of_cell.end(); ++iter) {
 			hex_cell.add_vert(*iter);
-			vertex(*iter).add_cell(ind);
+			vert_at(*iter).add_cell(csz);
 		}
-		for (iter = edge_in_cell.begin(); iter != edge_in_cell.end(); ++iter) {
+		for (iter = edge_of_cell.begin(); iter != edge_of_cell.end(); ++iter) {
 			hex_cell.add_edge(*iter);
-			edge(*iter).add_cell(ind);
+			edge_at(*iter).add_cell(csz);
 		}
 		
 		add_cell(hex_cell);

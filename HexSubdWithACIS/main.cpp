@@ -1,11 +1,10 @@
-#include "InitACIS.h"
-#include "GlobalDef.h"
+#include "init_acis.h"
+#include "globaldef.h"
 
-#include "Point3D.h"
 
 void main() {
 //	InitACIS acis("constructors");
- 	InitACIS acis("booleans");
+ 	init_acis acis("booleans");
  	create_cylinder_with_hole();
 
 }

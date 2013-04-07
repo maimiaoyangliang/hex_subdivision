@@ -5,43 +5,43 @@
 #include "Point3D.h"
 #include "HexVarDef.h"
 
-namespace HexMesh { 
+namespace hex_subdiv { 
 	
-	class HexVertex {
+	class hs_vert {
 	public:
-		HexVertex();
-		HexVertex(double, double, double);
-		HexVertex(const Point3D&);
-		HexVertex(const HexVertex& );
-		HexVertex& operator= (const HexVertex&);
+		hs_vert();
+		hs_vert(double, double, double);
+		hs_vert(const hs_point&);
+		hs_vert(const hs_vert& );
+		hs_vert& operator= (const hs_vert&);
 		
-		virtual ~HexVertex() {}
+		virtual ~hs_vert() {}
 		
-		Point3D coord() const { return coordinate; }
+		hs_point coord() const { return coordinate; }
 		
-		void set_coord(const Point3D& p) { coordinate = p; }
-		void add_edge(size_t ind) { edgeIndices.insert(ind); }
-		void add_face(size_t ind) { faceIndices.insert(ind); }
-		void add_cell(size_t ind) { cellIndices.insert(ind); }
+		void set_coord(const hs_point& p) { coordinate = p; }
+
+		void add_edge(size_t idx) { edge_idx.insert(idx); }
+		void add_face(size_t idx) { face_idx.insert(idx); }
+		void add_cell(size_t idx) { cell_idx.insert(idx); }		
 		
-		
-		int_set_iter first_edge()  { return edgeIndices.begin(); }
-		int_set_iter end_edge()  { return edgeIndices.end(); }
-		size_t edge_size()  { return edgeIndices.size(); }
-		
-		int_set_iter first_face()  { return faceIndices.begin(); }
-		int_set_iter end_face()  { return faceIndices.end(); }
-		size_t face_size() const { return faceIndices.size(); }
-		
-		int_set_iter first_cell()  { return cellIndices.begin(); }
-		int_set_iter end_cell()  { return cellIndices.end(); }
-		size_t cell_size() const { return cellIndices.size(); }
+		int_set_iter first_edge()  { return edge_idx.begin(); }
+		int_set_iter first_face()  { return face_idx.begin(); }
+		int_set_iter first_cell()  { return cell_idx.begin(); }
+
+		int_set_iter end_edge()  { return edge_idx.end(); }
+		int_set_iter end_face()  { return face_idx.end(); }
+		int_set_iter end_cell()  { return cell_idx.end(); }
+
+		size_t edge_size()  { return edge_idx.size(); }
+		size_t face_size() const { return face_idx.size(); }	
+		size_t cell_size() const { return cell_idx.size(); }
 		
 	private:	
-		Point3D	coordinate;             // the coordinate of vertex 
-		int_set edgeIndices;			// link of edges containing the vertex;
-		int_set faceIndices;			// link of faces containing the vertex;
-		int_set cellIndices;			// link of cells containing the vertex;
+		hs_point	coordinate;             // the coordinate of vertex 
+		int_set edge_idx;			// link of edges containing the vertex;
+		int_set face_idx;			// link of faces containing the vertex;
+		int_set cell_idx;			// link of cells containing the vertex;
 	};
 	
 } // namespace

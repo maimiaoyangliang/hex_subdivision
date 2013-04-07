@@ -7,46 +7,42 @@
 
 class ENTITY_LIST;
 
-namespace HexMesh {
+namespace hex_subdiv {
 
-	class HexModel;
+	class hs_model;
 	
-	class Subdivision {
+	class hs_subdiv {
 	public:
-		Subdivision(HexMesh::HexModel* hex_model);
+		hs_subdiv(hex_subdiv::hs_model* hex_model);
 		
-		virtual ~Subdivision();
+		virtual ~hs_subdiv();
 		
-		void ApproximateSubdivision(ENTITY_LIST&);
-		void InterpolateSubdivision();
-		
-	private:
-		void CalcCellPoints();
-		void CalcFacePoints();
-		void CalcFacePointsInter();
-		void CalcEdgePoints();
-		void CalcEdgePointsInter();
-		void CalcNewVertices();
-		void CalcNewVerticesInter();
-
-		void ChangeNewVertices();
-		void LaplacianSmoothing(HexModel*);
-
-		void NewVertexList(HexModel* pNewModel);
-		void NewEdgeList(HexModel* pNewModel);
-		void NewFaceList(HexModel* pNewModel);
-		void NewCellList(HexModel* pNewModel);
-		
-		void FreeMemory();
+//		void ApproximateSubdivision(ENTITY_LIST&);
+		void inter_subdiv(ENTITY_LIST&);
 		
 	private:
-		HexModel* m_pHexModel;
-		size_t subdiv_counter;	// count the number of  subdivision
+
+		typedef std::vector<hs_point> point_vector;
+
+		void calc_cell_point(point_vector&);
+		void calc_face_point(point_vector&, point_vector&);
+		void calc_edge_point(point_vector&, point_vector&, point_vector&);
+		void calc_vert_point(point_vector&, point_vector&, point_vector&, point_vector&);
+
+//		void ChangeNewVertices();
+		void laplacian_smoothing(hs_model*);
+
+		void create_vert_list(hs_model* pNewModel, point_vector&, point_vector&, point_vector&, point_vector&);
+		void create_edge_list(hs_model* pNewModel, point_vector&, point_vector&, point_vector&);
+		void create_face_list(hs_model* pNewModel, point_vector&, point_vector&, point_vector&);
+		void create_cell_list(hs_model* pNewModel, point_vector&, point_vector&, point_vector&);
 		
-		std::vector<Point3D> newVertices;
-		std::vector<Point3D> edgePoints;
-		std::vector<Point3D> facePoints;
-		std::vector<Point3D> cellPoints; 
+//		void FreeMemory();
+		
+	private:
+		hs_model* phexmodel;
+		size_t	  subdiv_counter;	// count the number of  subdivision
+
 	};
 }
 
