@@ -81,9 +81,9 @@ void test_gear() {
 	
 	hex_subdiv::hs_example hex_example;
 	
-	//	hex_example.make_gear(".\\model\\gear\\sat\\gear.sat", wirelist);
-	//	acis.save_sat_file(".\\model\\gear\\sat\\gear-model.sat", wirelist);
-	//	wirelist.clear();
+//	hex_example.make_gear(".\\model\\gear\\sat\\gear.sat", wirelist);
+//	acis.save_sat_file(".\\model\\gear\\sat\\gear-model.sat", wirelist);
+//	wirelist.clear();
 	hex_example.gear(wirelist, hex_model,".\\model\\gear\\sat\\gear-model.sat");
 //	wirelist.clear();
 //	hex_model.acis_wire(wirelist);
@@ -94,7 +94,7 @@ void test_gear() {
 	sub.inter_subdiv();
 	sub.laplacian_smoothing_adaptive();
 	
-	sub.model()->save_file("E:\\2_sub.obj", "obj");
+	sub.model()->save_file(".\\model\\gear\\obj\\2_sub.obj", "obj");
 
 // 	sub.model()->check_edge();
 // 	sub.model()->check_face();
@@ -105,7 +105,7 @@ void test_gear() {
 // 	sub.model()->print_cell(".\\model\\gear\\txt\\1_cell.txt");
 // 	sub.model()->acis_wire(sublist);
 // 	sublist.add(wirelist);
- //	acis.save_sat_file(".\\model\\gear\\sat\\gear-test.sat", wirelist); 
+//	acis.save_sat_file(".\\model\\gear\\sat\\gear-test.sat", wirelist); 
 //	show_wire_model(sublist, ".\\model\\gear\\txt\\2_vert.txt", ".\\model\\gear\\txt\\2_edge.txt");
- // 	acis.save_sat_file(".\\model\\gear\\sat\\gear-sub.sat", sublist);
+// 	acis.save_sat_file(".\\model\\gear\\sat\\gear-sub.sat", sublist);
 }
