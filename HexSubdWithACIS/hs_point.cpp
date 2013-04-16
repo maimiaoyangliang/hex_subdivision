@@ -51,25 +51,21 @@ namespace hex_subdiv {
 	}
 	
 	void hs_point::zero() {
-		_x = _y = _z = 0.0;
+		_x = _y = _z = 0.0;  
 	}
 	
-	void hs_point::print() const{
+
+	void hs_point::print() const {
 		std::cout << "[" << _x << ", "
 			<< _y << ", " << _z << "]" << std::endl;
 	}
 	
-	hs_point& hs_point::unify() {
+	// vector unitization 
+	hs_point& hs_point::unit() {
 		double len = length();
-		assert( len > DELTA );
-		/*if( len < 1.0e-20 ) {
-		_x = rand()%1000+20; _y = rand()%1000+20; _z = rand()%1000+20;
-		len=length();
-		_x/=len; _y/=len; _z/=len;
-	} else */{
-		len = 1.0f/len;
+		assert( len > DELTA );  
+		len = 1.0f / len;
 		_x *= len; _y *= len; _z *= len;
-		}
 		
 		return *this;
 	}
@@ -95,5 +91,10 @@ namespace hex_subdiv {
 		return p * (1 / d);
 	}
 	
+	bool operator== (const hs_point& p1, const hs_point& p2) {
+		return abs(p1.x() - p2.x()) < DELTA 
+			&& abs(p1.y() - p2.y()) < DELTA 
+			&& abs(p1.z() - p2.z()) < DELTA;
+	}
 	
 }// namespace

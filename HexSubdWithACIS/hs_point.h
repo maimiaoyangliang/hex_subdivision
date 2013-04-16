@@ -32,8 +32,8 @@ namespace hex_subdiv {
 		double	length();
 		void	zero();
 		hs_point cross(const hs_point &);
-		hs_point& unify();
-		inline void	print() const;
+		hs_point& unit();
+		void	print() const;
 		
 	private:
 		double _x, _y, _z;
@@ -46,6 +46,8 @@ namespace hex_subdiv {
 	hs_point operator* (double, const hs_point&);
 	
 	hs_point operator/ (const hs_point&, double);
+
+	bool operator== (const hs_point&, const hs_point&);
 	
 	
 } // namespace

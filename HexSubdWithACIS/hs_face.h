@@ -31,9 +31,13 @@ namespace hex_subdiv {
 		int fst_cell()  { return cell_idx[0]; }
 		int snd_cell()  { return cell_idx[1]; }
 		
+		int_set_citer first_vert() const { return vert_idx.begin(); }
+		int_set_citer first_edge() const { return edge_idx.begin(); }
 		int_set_iter first_vert()  { return vert_idx.begin(); }
 		int_set_iter first_edge()  { return edge_idx.begin(); }
 		
+		int_set_citer end_vert() const { return vert_idx.end(); }
+		int_set_citer end_edge() const { return edge_idx.end(); }
 		int_set_iter end_vert()  { return vert_idx.end(); }
 		int_set_iter end_edge()  { return edge_idx.end(); }
 		

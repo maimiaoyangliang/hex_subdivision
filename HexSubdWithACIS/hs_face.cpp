@@ -1,11 +1,16 @@
 #include "hs_face.h"
 
+#include <algorithm>
+#include <ITERATOR>
+#include <CASSERT>
+
+
 namespace hex_subdiv {
 	
 	hs_face::hs_face() {
 		cell_idx[0] = cell_idx[1] = -1;
 		_acis_face = NULL;
-		_type = INNER_FACE;
+		_type = BORDER_FACE;
 	}
 	
 	hs_face::hs_face(const hs_face& f) {

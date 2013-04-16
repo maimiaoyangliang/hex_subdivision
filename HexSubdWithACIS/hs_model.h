@@ -2,6 +2,7 @@
 #define HS_MODEL_H_
 
 #include <VECTOR>
+#include <CASSERT>
 
 #include "hs_vert.h"
 #include "hs_edge.h"
@@ -24,6 +25,10 @@ namespace hex_subdiv {
 	typedef std::vector<hs_edge>::iterator edge_vector_iter;
 	typedef std::vector<hs_face>::iterator face_vector_iter;
 	typedef std::vector<hs_cell>::iterator cell_vector_iter;
+	typedef std::vector<hs_vert>::const_iterator vert_vector_citer;
+	typedef std::vector<hs_edge>::const_iterator edge_vector_citer;
+	typedef std::vector<hs_face>::const_iterator face_vector_citer;
+	typedef std::vector<hs_cell>::const_iterator cell_vector_citer;
 	
 	class hs_model {
 	public:
@@ -36,24 +41,21 @@ namespace hex_subdiv {
 		
 		virtual ~hs_model();
 		
-		void add_vert(const hs_vert& hex_vert) { vertices.push_back(hex_vert); }
-		void add_edge(const hs_edge& hex_edge) { edges.push_back(hex_edge); }
-		void add_face(const hs_face& hex_face) { faces.push_back(hex_face); }
-		void add_cell(const hs_cell& hex_cell) { cells.push_back(hex_cell); }
+		void add_vert(const hs_point&, vert_type);
+		void add_edge(size_t, size_t, EDGE*, edge_type);
+		void add_face_by_edges(const size_t[], size_t, FACE*, face_type);
+		void add_face_by_verts(const size_t[], size_t, FACE*, face_type);
+		void add_cell_by_faces(const size_t[], size_t);
+		void add_cell_by_verts(const size_t[], size_t);
 		
-		void add_vert(const hs_point&);
-		void add_edge(size_t, size_t);
-		void add_face(const size_t ei[], size_t);
-		void add_cell(const size_t ci[], size_t);
-		
-		void acis_wire(ENTITY_LIST&);
+		void acis_wire(ENTITY_LIST&) const;
 		void set_acis_edge(EDGE* [], size_t);
 		void set_acis_face(FACE* [], size_t);
 		
-		hs_vert& vert_at(size_t idx)  { return vertices[idx]; }
-		hs_edge& edge_at(size_t idx) { return edges[idx]; }
-		hs_face& face_at(size_t idx) { return faces[idx]; }
-		hs_cell& cell_at(size_t idx) { return cells[idx]; }
+		hs_vert& vert_at(size_t idx) { assert( idx < vert_size() ); return vertices[idx]; }
+		hs_edge& edge_at(size_t idx) { assert( idx < edge_size() ); return edges[idx]; }
+		hs_face& face_at(size_t idx) { assert( idx < face_size() ); return faces[idx]; }
+		hs_cell& cell_at(size_t idx) { assert( idx < cell_size() ); return cells[idx]; }
 		
 		vert_vector_iter first_vert()  { return vertices.begin(); }
 		edge_vector_iter first_edge()  { return edges.begin(); }
@@ -69,7 +71,21 @@ namespace hex_subdiv {
 		size_t edge_size() const { return edges.size(); }
 		size_t face_size() const { return faces.size(); }
 		size_t cell_size() const { return cells.size(); }
+
+		void print_vert(const char* = NULL) const;
+		void print_edge(const char* = NULL) const;
+		void print_face(const char* = NULL) const;
+		void print_cell(const char* = NULL) const;
+
+		void write_vert(const char*) const;
+		void write_edge(const char*) const;
+		void save_file(const char*, const char* = "obj") const; 
+		void check_face() const;
+		void check_edge() const; 
 		
+	private:
+		void sort_edge_of_face(size_t[], size_t) const;
+
 	private:
 		vert_vector vertices;
 		edge_vector edges;

@@ -85,7 +85,7 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\create_cylinder.cpp
+SOURCE=.\acis_mgr.cpp
 # End Source File
 # Begin Source File
 
@@ -94,6 +94,10 @@ SOURCE=.\hs_cell.cpp
 # Begin Source File
 
 SOURCE=.\hs_edge.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\hs_example.cpp
 # End Source File
 # Begin Source File
 
@@ -117,15 +121,7 @@ SOURCE=.\hs_vert.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\init_acis.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\main.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\save_sat_file.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -133,7 +129,7 @@ SOURCE=.\save_sat_file.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\GlobalDef.h
+SOURCE=.\acis_mgr.h
 # End Source File
 # Begin Source File
 
@@ -146,6 +142,10 @@ SOURCE=.\hs_cell.h
 # Begin Source File
 
 SOURCE=.\hs_edge.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\hs_example.h
 # End Source File
 # Begin Source File
 
@@ -166,10 +166,6 @@ SOURCE=.\hs_subdiv.h
 # Begin Source File
 
 SOURCE=.\hs_vert.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\init_acis.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

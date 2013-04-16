@@ -18,10 +18,14 @@ namespace hex_subdiv {
 		void add_edge(size_t idx) { edge_idx.insert(idx); }
 		void add_face(size_t idx) { face_idx.insert(idx); }
 		
+		int_set_citer first_vert() const { return vert_idx.begin(); }
+		int_set_citer first_face() const { return face_idx.begin(); }
 		int_set_iter first_vert()  { return vert_idx.begin(); }
 		int_set_iter first_edge()  { return edge_idx.begin(); }
 		int_set_iter first_face()  { return face_idx.begin(); }
 		
+		int_set_citer end_vert() const { return vert_idx.end(); }
+		int_set_citer end_face() const { return face_idx.end(); }
 		int_set_iter end_vert()  { return vert_idx.end(); }
 		int_set_iter end_edge()  { return edge_idx.end(); }
 		int_set_iter end_face()  { return face_idx.end(); }
