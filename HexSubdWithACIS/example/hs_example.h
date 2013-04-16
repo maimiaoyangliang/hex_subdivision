@@ -4,11 +4,13 @@
 #include <VECTOR>
 
 #include "position.hxx"
-class ENTITY_LIST;
+
 class FACE;
+class EDGE;
 class VERTEX;
 class COEDGE;
-class ENTITIY;
+class ENTITY;
+class ENTITY_LIST;
 
 namespace hex_subdiv {
 

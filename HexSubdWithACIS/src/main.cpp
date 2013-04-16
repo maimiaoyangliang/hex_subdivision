@@ -1,7 +1,7 @@
+#include "hs_example.h"
 #include "acis_mgr.h"
 #include "hs_model.h"
 #include "hs_subdiv.h"
-#include "hs_example.h"
 
 #include "lists.hxx"
 #include "cstrapi.hxx"

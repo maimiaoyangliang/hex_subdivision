@@ -85,43 +85,43 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\acis_mgr.cpp
+SOURCE=.\src\acis_mgr.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_cell.cpp
+SOURCE=.\src\hs_cell.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_edge.cpp
+SOURCE=.\src\hs_edge.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_example.cpp
+SOURCE=.\example\hs_example.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_face.cpp
+SOURCE=.\src\hs_face.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_model.cpp
+SOURCE=.\src\hs_model.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_point.cpp
+SOURCE=.\src\hs_point.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_subdiv.cpp
+SOURCE=.\src\hs_subdiv.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_vert.cpp
+SOURCE=.\src\hs_vert.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\main.cpp
+SOURCE=.\src\main.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -129,43 +129,43 @@ SOURCE=.\main.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\acis_mgr.h
+SOURCE=.\src\acis_mgr.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\hex_subdiv.h
+SOURCE=.\src\hex_subdiv.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_cell.h
+SOURCE=.\src\hs_cell.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_edge.h
+SOURCE=.\src\hs_edge.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_example.h
+SOURCE=.\example\hs_example.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_face.h
+SOURCE=.\src\hs_face.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_model.h
+SOURCE=.\src\hs_model.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_point.h
+SOURCE=.\src\hs_point.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_subdiv.h
+SOURCE=.\src\hs_subdiv.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\hs_vert.h
+SOURCE=.\src\hs_vert.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
