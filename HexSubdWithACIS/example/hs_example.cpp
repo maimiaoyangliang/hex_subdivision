@@ -304,14 +304,14 @@ namespace hex_subdiv {
 		}	
 	}
 	
-	void hs_example::gear(ENTITY_LIST& elist, hs_model& hex_model, const char* filepath) {
+	void hs_example::gear(ENTITY_LIST& init_mesh, hs_model& hex_model, const char* filepath) {
 
 		ENTITY_LIST glist;
 		FILE* file = acis_fopen(filepath, "r"); 
 		check_outcome( api_restore_entity_list(file, TRUE, glist) );
 		acis_fclose(file);
 
-		elist.add(glist);
+		init_mesh.add(glist);
 		
 		std::vector< FACE* > face_vec;
 		get_faces_of_gear(static_cast< BODY* >( glist[0] ), face_vec);
@@ -321,20 +321,10 @@ namespace hex_subdiv {
 		size_t novar; /** number of vertices a round of gear**/
 		get_vertices_of_gear(face_vec, verts_vec, spa_verts_vec, novar);
 
-/*		std::vector< SPAposition >::iterator vitr = verts_vec.begin();
-		for (; vitr != verts_vec.end(); ++vitr) {
-			elist.add( *vitr );
-		}
-*/
-
 		add_vertices_to_model(hex_model, verts_vec, novar);
 		add_edges_to_model(hex_model, face_vec, spa_verts_vec, novar);
 		add_faces_to_model(hex_model, face_vec, spa_verts_vec, novar);
 		add_cells_to_model(hex_model, novar);
-/*		hex_model.print_edge(".\\model\\edges.txt");
- 		hex_model.print_face(".\\model\\faces.txt");
- 		hex_model.print_cell(".\\model\\cells.txt");
-*/
 	}
 	
 	

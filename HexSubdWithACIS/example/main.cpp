@@ -67,45 +67,53 @@ void test_cylinder(size_t type, size_t sub_num) {
 	wirelist.add(cylist);
 	origlist.add(cylist);
 	lap_smt_list.add(cylist);
-	acis.save_sat_file(".\\model\\bicy\\sat\\bicy_origin.sat", origlist);
-	acis.save_sat_file(".\\model\\bicy\\sat\\bicy_sub_nolap.sat", wirelist);
-	acis.save_sat_file(".\\model\\bicy\\sat\\bicy_sub_lap.sat", lap_smt_list);
+	acis.save_sat_file("..\\model\\bicy\\sat\\bicy_origin.sat", origlist);
+	acis.save_sat_file("..\\model\\bicy\\sat\\bicy_sub_nolap.sat", wirelist);
+	acis.save_sat_file("..\\model\\bicy\\sat\\bicy_sub_lap.sat", lap_smt_list);
 }
 
 void test_gear() {
 
 	acis_mgr acis("booleans");
 	
-	ENTITY_LIST wirelist, sublist;
+	ENTITY_LIST wirelist, init_mesh, sublist;
 	hex_subdiv::hs_model hex_model;
 	
 	hex_subdiv::hs_example hex_example;
 	
-//	hex_example.make_gear(".\\model\\gear\\sat\\gear.sat", wirelist);
-//	acis.save_sat_file(".\\model\\gear\\sat\\gear-model.sat", wirelist);
-//	wirelist.clear();
-	hex_example.gear(wirelist, hex_model,".\\model\\gear\\sat\\gear-model.sat");
-//	wirelist.clear();
-//	hex_model.acis_wire(wirelist);
-// 	hex_model.check_edge();
-// 	hex_model.check_face();
- 	hex_subdiv::hs_subdiv sub(&hex_model);
-	sub.inter_subdiv();
-	sub.inter_subdiv();
-	sub.laplacian_smoothing_adaptive();
-	
-	sub.model()->save_file(".\\model\\gear\\obj\\2_sub.obj", "obj");
+// 	hex_example.make_gear(".\\model\\gear\\sat\\gear.sat", wirelist);
+// 	acis.save_sat_file(".\\model\\gear\\sat\\gear-model.sat", wirelist);
+// 	wirelist.clear();
 
-// 	sub.model()->check_edge();
-// 	sub.model()->check_face();
-// 	sub.model()->write_vert(".\\model\\gear\\txt\\2_vert.txt");
-// 	sub.model()->write_edge(".\\model\\gear\\txt\\2_edge.txt");
-// 	sub.model()->print_edge(".\\model\\gear\\txt\\1_edge.txt");
-// 	sub.model()->print_face(".\\model\\gear\\txt\\1_face.txt");
-// 	sub.model()->print_cell(".\\model\\gear\\txt\\1_cell.txt");
-// 	sub.model()->acis_wire(sublist);
-// 	sublist.add(wirelist);
-//	acis.save_sat_file(".\\model\\gear\\sat\\gear-test.sat", wirelist); 
-//	show_wire_model(sublist, ".\\model\\gear\\txt\\2_vert.txt", ".\\model\\gear\\txt\\2_edge.txt");
-// 	acis.save_sat_file(".\\model\\gear\\sat\\gear-sub.sat", sublist);
+	hex_example.gear(wirelist, hex_model,"..\\model\\gear\\sat\\gear-model.sat");
+
+	hex_model.acis_wire(init_mesh);
+
+ 	hex_subdiv::hs_subdiv sub(&hex_model);
+	sub.inter_subdiv(); // first subdivision
+//	sub.inter_subdiv(); // second subdivision
+	sub.laplacian_smoothing_adaptive();
+
+	/** compute each cell jacobian value and write to file **/
+	std::vector<double> jacob;
+	sub.jacobian(jacob);
+	char* jacob_file_path = "..\\model\\gear\\txt\\jacobian.txt";
+	FILE* file = fopen(jacob_file_path, "w");
+	if ( file ) {
+		std::vector<double>::iterator itr = jacob.begin();
+		for (size_t j = 0; itr != jacob.end(); ++itr) {
+			fprintf(file, "cell %d, jacobian: %f\n", j++, *itr);
+		}
+		fclose(file);
+		printf("%s is saved successfully...\n", jacob_file_path);
+	}
+ 
+	/** save model to .obj file **/
+	sub.model()->save_file("..\\model\\gear\\obj\\2_sub.obj", "obj");
+
+	/** save model to .sat file **/
+	sub.model()->acis_wire(sublist);
+	sublist.add(wirelist);
+	acis.save_sat_file("..\\model\\gear\\sat\\gear-sub.sat", sublist);
+	acis.save_sat_file("..\\model\\gear\\sat\\init-mesh.sat", init_mesh);
 }

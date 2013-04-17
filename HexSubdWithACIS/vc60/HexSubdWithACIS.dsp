@@ -85,43 +85,43 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\src\cpp\acis_mgr.cpp
+SOURCE=..\src\cpp\acis_mgr.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\cpp\hs_cell.cpp
+SOURCE=..\src\cpp\hs_cell.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\cpp\hs_edge.cpp
+SOURCE=..\src\cpp\hs_edge.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\example\hs_example.cpp
+SOURCE=..\example\hs_example.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\cpp\hs_face.cpp
+SOURCE=..\src\cpp\hs_face.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\cpp\hs_model.cpp
+SOURCE=..\src\cpp\hs_model.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\cpp\hs_point.cpp
+SOURCE=..\src\cpp\hs_point.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\cpp\hs_subdiv.cpp
+SOURCE=..\src\cpp\hs_subdiv.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\cpp\hs_vert.cpp
+SOURCE=..\src\cpp\hs_vert.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\example\main.cpp
+SOURCE=..\example\main.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -129,43 +129,43 @@ SOURCE=.\example\main.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\src\include\acis_mgr.h
+SOURCE=..\src\include\acis_mgr.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\include\hex_subdiv.h
+SOURCE=..\src\include\hex_subdiv.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\include\hs_cell.h
+SOURCE=..\src\include\hs_cell.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\include\hs_edge.h
+SOURCE=..\src\include\hs_edge.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\example\hs_example.h
+SOURCE=..\example\hs_example.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\include\hs_face.h
+SOURCE=..\src\include\hs_face.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\include\hs_model.h
+SOURCE=..\src\include\hs_model.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\include\hs_point.h
+SOURCE=..\src\include\hs_point.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\include\hs_subdiv.h
+SOURCE=..\src\include\hs_subdiv.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\include\hs_vert.h
+SOURCE=..\src\include\hs_vert.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
