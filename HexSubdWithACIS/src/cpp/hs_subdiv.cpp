@@ -767,7 +767,10 @@ namespace hex_subdiv {
 					vec[i] -= vert_pos; 
 					vec[i++].unit();
 				}
-				double jac = ABS( vec[0].dot( vec[1].cross(vec[2]) ) ); // mixed product
+				double jac = vec[0].dot( vec[1].cross( vec[2] ) );
+				if ( jac < 0) {
+					jac = vec[0].dot( vec[2].cross( vec[1] ) );
+				}
 				min_jacob = jac < min_jacob ? jac : min_jacob;
 				vert_set.clear();
 			}
