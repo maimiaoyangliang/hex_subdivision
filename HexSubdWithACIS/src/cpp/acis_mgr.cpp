@@ -76,10 +76,10 @@ void acis_mgr::init_map() {
 
 void acis_mgr::save_sat_file(const char* filename, ENTITY_LIST& savelist) {
 	API_NOP_BEGIN
-		FileInfo info;
+	FileInfo info;
 	info.set_product_id("ZJU");
 	info.set_units(1.0);
-	outcome res = api_set_file_info(FileId|FileUnits,info);
+	outcome res = api_set_file_info(FileId | FileUnits, info);
 	check_outcome(res);
 	res = api_save_version(14, 0);
 	check_outcome(res);

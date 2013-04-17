@@ -23,11 +23,11 @@ namespace hex_subdiv {
 		
 		void set_acis_edge(EDGE* acis_edge) { _acis_edge = acis_edge; }
 		void set_start_vert(size_t v) { vert_idx[0] = v; }
-		void set_end_vert(size_t v) { vert_idx[1] = v; }
+		void set_end_vert(size_t v)   { vert_idx[1] = v; }
 		void set_type(edge_type type) { _type = type; }
 		
 		size_t start_vert() const { return vert_idx[0]; }
-		size_t end_vert() const { return vert_idx[1]; }
+		size_t end_vert()   const { return vert_idx[1]; }
 		
 		int_set_iter first_face()  { return face_idx.begin(); }
 		int_set_iter first_cell()  { return cell_idx.begin(); }
@@ -39,18 +39,18 @@ namespace hex_subdiv {
 		size_t cell_size() const { return cell_idx.size(); }
 		
 		const EDGE* acis_edge() const { return _acis_edge; }		
-		edge_type type() const { return _type; }
+		edge_type type()        const { return _type; }
 		
 		
 	private:
-		int_set face_idx;
-		int_set cell_idx;
-		size_t  vert_idx[2];
-		EDGE*   _acis_edge;
+		int_set   face_idx;
+		int_set   cell_idx;
+		size_t    vert_idx[2];
+		EDGE*     _acis_edge;
 		edge_type _type;
 		
 	};
 	
-} // namespace
+} // end namespace
 
 #endif

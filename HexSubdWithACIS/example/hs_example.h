@@ -30,9 +30,10 @@ namespace hex_subdiv {
 		void  print_vert(std::vector< VERTEX* >&, const char* = NULL) const; 
 
 		// gear
+		void get_faces_of_gear(ENTITY* , std::vector< FACE* >& );
 		void get_vertices_of_gear( std::vector< FACE* >&, std::vector< SPAposition >&,
 			std::vector< VERTEX* >& , size_t& );
-		void get_faces_of_gear(ENTITY* , std::vector< FACE* >& );
+
 		void add_vertices_to_model(hs_model&, std::vector< SPAposition >&, size_t);
 		void add_edges_to_model(hs_model&, std::vector< FACE* >&, std::vector< VERTEX* >&, size_t);
 		void add_faces_to_model(hs_model&, std::vector< FACE* >&, std::vector< VERTEX* >&, size_t);

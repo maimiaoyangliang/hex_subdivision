@@ -6,6 +6,10 @@
 #include <MAP>
 #include <STRING>
 
+#ifndef ACIS
+#define ACIS
+#endif
+
 #include "ckoutcom.hxx" 
 
 class ENTITY_LIST;

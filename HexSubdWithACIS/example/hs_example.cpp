@@ -321,19 +321,20 @@ namespace hex_subdiv {
 		size_t novar; /** number of vertices a round of gear**/
 		get_vertices_of_gear(face_vec, verts_vec, spa_verts_vec, novar);
 
-/*
-		std::vector< SPAposition >::iterator vitr = verts_vec.begin();
+/*		std::vector< SPAposition >::iterator vitr = verts_vec.begin();
 		for (; vitr != verts_vec.end(); ++vitr) {
 			elist.add( *vitr );
-		}*/
+		}
+*/
 
 		add_vertices_to_model(hex_model, verts_vec, novar);
 		add_edges_to_model(hex_model, face_vec, spa_verts_vec, novar);
 		add_faces_to_model(hex_model, face_vec, spa_verts_vec, novar);
 		add_cells_to_model(hex_model, novar);
-//		hex_model.print_edge(".\\model\\edges.txt");
-// 		hex_model.print_face(".\\model\\faces.txt");
-// 		hex_model.print_cell(".\\model\\cells.txt");
+/*		hex_model.print_edge(".\\model\\edges.txt");
+ 		hex_model.print_face(".\\model\\faces.txt");
+ 		hex_model.print_cell(".\\model\\cells.txt");
+*/
 	}
 	
 	
@@ -411,8 +412,8 @@ namespace hex_subdiv {
 	
 	
 	void hs_example::get_vertices_of_gear( std::vector< FACE* >& face_vec, 
-		std::vector< SPAposition >& verts_vec, std::vector< VERTEX* >& spa_verts_vec, size_t& novar) {
-	
+		std::vector< SPAposition >& verts_vec, std::vector< VERTEX* >& spa_verts_vec, size_t& novar) 
+	{
 		FACE* gface;
 		EDGE* gedge;
 		LOOP* gloop;
@@ -662,11 +663,11 @@ namespace hex_subdiv {
 			face = static_cast< FACE* >( face_list.next() );
 		} 
 	}
-	
+
+	/** novar: number of vertices a round of gear **/
 	void hs_example::add_vertices_to_model( hs_model& hex_model, 
-		std::vector< SPAposition >& verts_vec, size_t novar) {
-		/** novar: number of vertices a round of gear **/
-		
+		std::vector< SPAposition >& verts_vec, size_t novar) 
+	{	
 		std::vector< SPAposition >::iterator vitr = verts_vec.begin();
 		for (size_t level = 0; level < 2; ++level) { 		
 			for (size_t ctrl = 0; ctrl < 10; ++ctrl) {
@@ -706,8 +707,8 @@ namespace hex_subdiv {
 	}
 	
 	void hs_example::add_edges_to_model( hs_model& hex_model, std::vector< FACE* >& face_vec,
-		std::vector< VERTEX*>& spa_verts_vec, size_t novar) {
- 
+		std::vector< VERTEX*>& spa_verts_vec, size_t novar)
+	{
 		const size_t HALF_VERTS_NUM = static_cast< size_t >( hex_model.vert_size() / 2 );
 		size_t vidx = 0; 
 		for (size_t level = 0; level < 2; ++level) { 
@@ -899,8 +900,8 @@ namespace hex_subdiv {
 	}
 	
 	void hs_example::add_faces_to_model( hs_model& hex_model, std::vector< FACE* >& face_vec, 
-		std::vector< VERTEX* >& spa_verts_vec, size_t novar) {
-
+		std::vector< VERTEX* >& spa_verts_vec, size_t novar) 
+	{
 		const size_t HALF_VERTS_NUM = static_cast< size_t >( hex_model.vert_size() / 2);
 		size_t vidx = 0;
 		for (size_t level = 0; level < 2; ++level) {

@@ -14,10 +14,7 @@ namespace hex_subdiv {
 	
 	
 	
-} // namespace
-
-
-
+} // end namespace
 
 #endif
 

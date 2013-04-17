@@ -24,6 +24,7 @@ namespace hex_subdiv {
 		face_idx = v.face_idx;
 		cell_idx = v.cell_idx;
 		_type = v._type;
+
 		return (*this);
 	}
 	

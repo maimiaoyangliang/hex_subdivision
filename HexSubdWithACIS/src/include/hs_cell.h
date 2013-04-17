@@ -3,7 +3,6 @@
 
 #include "hex_subdiv.h"
 
-
 namespace hex_subdiv {
 	
 	class hs_cell {
@@ -35,14 +34,13 @@ namespace hex_subdiv {
 		size_t face_size() const { return face_idx.size(); }
 		
 		void clear_all() { vert_idx.clear(); edge_idx.clear(); face_idx.clear(); }
-		
-		
+				
 	private:
 		int_set vert_idx;
 		int_set edge_idx;
 		int_set face_idx;
 	};
 	
-} // namespace
+} // end namespace
 
 #endif

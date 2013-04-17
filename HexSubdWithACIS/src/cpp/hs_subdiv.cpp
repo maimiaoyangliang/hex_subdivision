@@ -26,7 +26,6 @@ namespace hex_subdiv {
 #define ABS( var ) (var) < 0 ? (-(var)) : (var)
 
 
-
 	hs_subdiv::hs_subdiv(hs_model* hex_model)
 		: phexmodel(new hs_model(*hex_model))
 		, subdiv_counter(0)
@@ -37,7 +36,6 @@ namespace hex_subdiv {
 			delete phexmodel;
 	}
 	
-
 	
 	// calculate cell point coordinate by iterating each cell	
 	void hs_subdiv::calc_cell_point( point_vector& cell_points ) {
@@ -101,8 +99,8 @@ namespace hex_subdiv {
 	void hs_subdiv::calc_edge_point(point_vector& edge_points
 		, point_vector& face_points
 		, point_vector& cell_points
-		) {
-		
+		) 
+	{	
 		size_t idx = 0;
 		hs_point cent;
 		edge_vector_iter edge_iter = phexmodel->first_edge();
@@ -172,8 +170,8 @@ namespace hex_subdiv {
 		, point_vector& edge_points
 		, point_vector& face_points
 		, point_vector& cell_points
-		) {
-		
+		) 
+	{	
 		hs_point cent;
 		vert_vector_iter vert_iter = phexmodel->first_vert();
 		for (; vert_iter != phexmodel->end_vert(); ++ vert_iter) {
@@ -380,8 +378,8 @@ namespace hex_subdiv {
 		, point_vector& edge_points
 		, point_vector& face_points
 		, point_vector& cell_points
-		) {
-		
+		) 
+	{
 		point_vector_iter vert_iter;
 		size_t idx = 0;
 		vert_iter = vert_points.begin();
@@ -777,7 +775,6 @@ namespace hex_subdiv {
 			jacob.push_back(min_jacob);
 		}
 	}
-	
 	
 	
 } // namespace

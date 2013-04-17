@@ -226,8 +226,8 @@ namespace hex_subdiv {
 		, size_t esize
 		, FACE* spa_face
 		, face_type ftype
-		) {
-
+		) 
+	{
 		hs_face hex_face;
 		hex_face.set_type(ftype);
 		hex_face.set_acis_face(spa_face);
@@ -326,7 +326,8 @@ namespace hex_subdiv {
 	}
 	
 	void hs_model::add_face_by_verts( const size_t vidx[], size_t vsz,
-		FACE* spa_face, face_type ftype) {
+		FACE* spa_face, face_type ftype)
+	{
 		int_set edge_idx;
 		for (size_t i = 0; i < vsz; ++i) {  
 			hs_vert& vert = vert_at( vidx[i] ); 
@@ -533,10 +534,5 @@ namespace hex_subdiv {
 			}
 		}
 	}
-	
-	
-	
-	
-	
 		
 } // namespace
