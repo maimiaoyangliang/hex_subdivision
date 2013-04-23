@@ -31,8 +31,8 @@ namespace hex_subdiv {
 		
 		void calc_cell_point(point_vector&);
 		void calc_face_point(point_vector&, point_vector&);
-		void calc_edge_point(point_vector&, point_vector&, point_vector&);
-		void calc_vert_point(point_vector&, point_vector&, point_vector&, point_vector&);
+		void calc_edge_point(point_vector&, point_vector&);
+		void calc_vert_point(point_vector&, point_vector&);
 		 
 		double laplacian_smoothing();
 		

@@ -52,7 +52,7 @@ void test_gear_coarse() {
 	init_mesh.add(spa_model);
 	acis.save_sat_file("..\\model\\gear\\sat\\coarse_init_mesh.sat", init_mesh);
 
-	const size_t NUM_OF_SUB = 2;
+	const size_t NUM_OF_SUB = 1;
 	std::stringstream ss;
 	std::string itos;
 	/** no laplacian smoothing **/

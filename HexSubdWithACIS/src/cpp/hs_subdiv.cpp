@@ -96,11 +96,8 @@ namespace hex_subdiv {
 	//	2) crease edge, which has 2 adjacent border faces
 	//	3) ordinary border edge( except crease ), 
 	//     which has 2 adjacent border faces and other inner faces
-	void hs_subdiv::calc_edge_point(point_vector& edge_points
-		, point_vector& face_points
-		, point_vector& cell_points
-		) 
-	{	
+	void hs_subdiv::calc_edge_point(point_vector& edge_points, point_vector& cell_points) {	
+
 		size_t idx = 0;
 		hs_point cent;
 		edge_vector_iter edge_iter = phexmodel->first_edge();
@@ -114,7 +111,13 @@ namespace hex_subdiv {
 				hs_point avg_face_point;
 				int_set_iter face_iter = edge_iter->first_face();
 				for (; face_iter != edge_iter->end_face(); ++face_iter) {
-					avg_face_point += face_points[*face_iter];
+					hs_point avg_cent_face;
+					hs_face& f = phexmodel->face_at(*face_iter);
+					int_set_iter vitr = f.first_vert();
+					for (; vitr != f.end_vert(); ++vitr) {
+						avg_cent_face += phexmodel->vert_at(*vitr).coord();
+					}
+					avg_face_point += avg_cent_face / f.vert_size();
 				} 
 				avg_face_point /= edge_iter->face_size();
 				
@@ -126,7 +129,8 @@ namespace hex_subdiv {
 				avg_cell_point /= edge_iter->cell_size();
 				
 				// average of midpoint, face point and cell point
-				cent = (cent + avg_face_point + avg_cell_point) / 3;
+				size_t n = edge_iter->face_size();
+				cent = ((n - 3) * cent + 2 * avg_face_point + avg_cell_point) / n;
 				
 			} else if ( edge_iter->type() == CREASE_EDGE ) {
 				// crease edge
@@ -166,12 +170,8 @@ namespace hex_subdiv {
 	//	2) corner point, 
 	//	3) point on crease 
 	//	4) ordinary border point on adjacent surface
-	void hs_subdiv::calc_vert_point(point_vector& vert_points
-		, point_vector& edge_points
-		, point_vector& face_points
-		, point_vector& cell_points
-		) 
-	{	
+	void hs_subdiv::calc_vert_point(point_vector& vert_points, point_vector& cell_points) {
+		
 		hs_point cent;
 		vert_vector_iter vert_iter = phexmodel->first_vert();
 		for (; vert_iter != phexmodel->end_vert(); ++ vert_iter) {
@@ -191,7 +191,13 @@ namespace hex_subdiv {
 				hs_point avg_face_point;
 				int_set_iter face_iter = vert_iter->first_face();
 				for (; face_iter != vert_iter->end_face(); ++face_iter) {
-					avg_face_point += face_points[*face_iter];
+					hs_point avg_cent_face;
+					hs_face& f = phexmodel->face_at(*face_iter);
+					int_set_iter vitr = f.first_vert();
+					for (; vitr != f.end_vert(); ++vitr) {
+						avg_cent_face += phexmodel->vert_at(*vitr).coord();
+					}
+					avg_face_point += avg_cent_face / f.vert_size();
 				}
 				
 				avg_face_point /= vert_iter->face_size();
@@ -207,9 +213,7 @@ namespace hex_subdiv {
 				
 				avg_mid_edge /= vert_iter->edge_size();
 				
-				int fsize = vert_iter->face_size();
-				cent = (cent * (fsize - 6) + avg_mid_edge * 3 
-					+ avg_face_point * 2 + avg_cell_point) / fsize;
+				cent = (cent + avg_mid_edge * 3 + avg_face_point * 3 + avg_cell_point) / 8;
 				
 			} else if ( vert_iter->type() == CREASE_VERT ){
 				// crease vertex
@@ -696,8 +700,8 @@ namespace hex_subdiv {
 		
 		calc_cell_point(cell_points);
 		calc_face_point(face_points, cell_points);
-		calc_edge_point(edge_points, face_points, cell_points);
-		calc_vert_point(vert_points, edge_points, face_points, cell_points);
+		calc_edge_point(edge_points, cell_points);
+		calc_vert_point(vert_points, cell_points);
 		
 		// new model
 		hs_model* p_new_model = new hs_model;
