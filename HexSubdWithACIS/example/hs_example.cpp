@@ -304,7 +304,7 @@ namespace hex_subdiv {
 		}	
 	}
 	
-	void hs_example::gear(ENTITY_LIST& init_mesh, hs_model& hex_model, const char* filepath) {
+	void hs_example::gear_coarse(ENTITY_LIST& init_mesh, hs_model& hex_model, const char* filepath) {
 
 		ENTITY_LIST glist;
 		FILE* file = acis_fopen(filepath, "r"); 
@@ -313,22 +313,72 @@ namespace hex_subdiv {
 
 		init_mesh.add(glist);
 		
+		glist.init();
 		std::vector< FACE* > face_vec;
-		get_faces_of_gear(static_cast< BODY* >( glist[0] ), face_vec);
-		
+		get_faces_of_gear(static_cast< BODY* >( glist.first() ), face_vec);
+		get_faces_of_gear(static_cast< BODY* >( glist.next() ), face_vec);
 		std::vector< VERTEX* > spa_verts_vec;
 		std::vector< SPAposition > verts_vec;
 		size_t novar; /** number of vertices a round of gear**/
-		get_vertices_of_gear(face_vec, verts_vec, spa_verts_vec, novar);
+		get_vertices_of_gear_coarse(face_vec, verts_vec, spa_verts_vec, novar);
 
-		add_vertices_to_model(hex_model, verts_vec, novar);
-		add_edges_to_model(hex_model, face_vec, spa_verts_vec, novar);
-		add_faces_to_model(hex_model, face_vec, spa_verts_vec, novar);
-		add_cells_to_model(hex_model, novar);
+		add_vertices_to_model_coarse(hex_model, verts_vec, novar);
+		add_edges_to_model_coarse(hex_model, face_vec, spa_verts_vec, novar);
+		add_faces_to_model_coarse(hex_model, face_vec, spa_verts_vec, novar);
+		add_cells_to_model_coarse(hex_model, novar);
 	}
 	
+	void hs_example::gear_compact(ENTITY_LIST& init_mesh, hs_model& hex_model, const char* filepath) {
+		
+		ENTITY_LIST glist;
+		FILE* file = acis_fopen(filepath, "r"); 
+		check_outcome( api_restore_entity_list(file, TRUE, glist) );
+		acis_fclose(file);
+		
+		init_mesh.add(glist);
+		
+		glist.init();
+		std::vector< FACE* > face_vec;
+		get_faces_of_gear(static_cast< BODY* >( glist.first() ), face_vec);
+		get_faces_of_gear(static_cast< BODY* >( glist.next() ), face_vec);
+		std::vector< VERTEX* > spa_verts_vec;
+		std::vector< SPAposition > verts_vec;
+		size_t novar; /** number of vertices a round of gear**/
+		get_vertices_of_gear_compact(face_vec, verts_vec, spa_verts_vec, novar);
+		
+		add_vertices_to_model_compact(hex_model, verts_vec, novar);
+		add_edges_to_model_compact(hex_model, face_vec, spa_verts_vec, novar);
+		add_faces_to_model_compact(hex_model, face_vec, spa_verts_vec, novar);
+		add_cells_to_model_compact(hex_model, novar);
+	}
+
+	void hs_example::make_gear_coarse( const char* filepath, ENTITY_LIST& elist) {
+		
+		ENTITY_LIST glist;
+		FILE* file = acis_fopen(filepath, "r");
+		outcome res = api_restore_entity_list(file, TRUE, glist);
+		check_outcome(res);
+		BODY* gbody = static_cast< BODY* >( glist[0] );
+		
+		FACE* cylinder[1];
+		double radius = hs_point(13, -1.5, 0).length();
+		double start_degree = atan(1.5 / 13) * 180 / M_PI; 
+		double end_degree = 360 - start_degree;
+		SPAposition center = SPAposition(0,0,-12.5);
+		SPAvector normal = SPAvector(0,0,25);
+		res = api_face_cylinder_cone(center, normal, radius, radius,
+			start_degree,end_degree,1,NULL,cylinder[0]);
+		check_outcome(res); 
+		
+		BODY* gnewbody;
+		res = api_mk_by_faces(NULL, 1, cylinder, gnewbody);
+		check_outcome(res);
+		
+		elist.add(gbody);
+		elist.add(gnewbody);
+	}
 	
-	void hs_example::make_gear(const char* filepath, ENTITY_LIST& elist) {
+	void hs_example::make_gear_compact(const char* filepath, ENTITY_LIST& elist) {
 		
 		ENTITY_LIST glist;
 		FILE* file = acis_fopen(filepath, "r");
@@ -336,21 +386,58 @@ namespace hex_subdiv {
 		check_outcome(res);
 		BODY* gbody = static_cast< BODY* >( glist[0] );
 
-		FACE* cylinder[1];
-		double radius = hs_point(13, -1.5, 0).length();
-		double start_degree = atan(1.5 / 13) * 180 / M_PI; 
-		double end_degree = 360 - start_degree;
-		res = api_face_cylinder_cone(SPAposition(0,0,-12.5), SPAvector(0,0,25), 
-			radius, radius,start_degree,end_degree,1,NULL,cylinder[0]);
-		check_outcome(res); 
-
+		const size_t NUM_FACE_INS = 4;
+		FACE* cylinder[NUM_FACE_INS];
+		double radius[NUM_FACE_INS] = {hs_point(13, -1.5, 0).length(), 23, 29, 35};
+		double start_degree[NUM_FACE_INS] = {atan(1.5 / 13) * 180 / M_PI, 0, 0, 0}; 
+		double end_degree[NUM_FACE_INS] = {360 - start_degree[0], 360, 360, 360};
+		SPAposition center[NUM_FACE_INS] = {SPAposition(0,0,-12.5), SPAposition(0,0,-3.5), SPAposition(0,0,-3.5), SPAposition(0,0,-3.5)};
+		SPAvector normal[NUM_FACE_INS] = {SPAvector(0,0,25), SPAvector(0,0,7), SPAvector(0,0,7), SPAvector(0,0,7)};
+		for (size_t i = 0; i < NUM_FACE_INS; ++i) {
+			res = api_face_cylinder_cone(center[i], normal[i], radius[i], radius[i],
+				start_degree[i],end_degree[i],1,NULL,cylinder[i]);
+			check_outcome(res);
+			
+		}
 		BODY* gnewbody;
-		res = api_mk_by_faces(gbody ,1, cylinder, gnewbody);
+		res = api_mk_by_faces(NULL, NUM_FACE_INS, cylinder, gnewbody);
 		check_outcome(res);
-
-		elist.add(gnewbody); 
+		
+		elist.add(gbody);
+		elist.add(gnewbody);
 	}
 	
+	void hs_example::get_faces_of_gear( ENTITY* ent, std::vector< FACE* >& face_vec) {
+		
+		ENTITY_LIST face_list;
+		check_outcome( api_get_faces(ent, face_list) );
+		face_list.init();
+		FACE* face = static_cast< FACE* >( face_list.first() );
+		while ( face ) {
+			face_vec.push_back(face);
+			face = static_cast< FACE* >( face_list.next() );
+		} 
+	}
+	
+	FACE* hs_example::get_face_by_2_vert( VERTEX* v1, VERTEX* v2) {
+		if ( !v1 || !v2 ) return NULL;
+		ENTITY_LIST face_list_1, face_list_2;
+		check_outcome( api_get_faces(v1, face_list_1) );
+		check_outcome( api_get_faces(v2, face_list_2) );
+		face_list_1.init(); face_list_2.init();
+		FACE* face1 = static_cast< FACE* >( face_list_1.first() );
+		while ( face1 ) {
+			FACE* face2 = static_cast< FACE* >( face_list_2.first() );
+			while ( face2 ) {
+				if ( face1 == face2 ) return face1;
+				face2 = static_cast< FACE* >( face_list_2.next() );
+			}
+			face1 = static_cast< FACE* >( face_list_1.next() );
+		}
+		
+		return NULL;
+	}
+
 	EDGE* hs_example::get_edge_by_2_vert( VERTEX* v1, VERTEX* v2) {
 		if ( !v1 || !v2 ) return NULL;
 		ENTITY_LIST elist1, elist2;
@@ -401,7 +488,7 @@ namespace hex_subdiv {
 	}
 	
 	
-	void hs_example::get_vertices_of_gear( std::vector< FACE* >& face_vec, 
+	void hs_example::get_vertices_of_gear_coarse( std::vector< FACE* >& face_vec, 
 		std::vector< SPAposition >& verts_vec, std::vector< VERTEX* >& spa_verts_vec, size_t& novar) 
 	{
 		FACE* gface;
@@ -411,12 +498,12 @@ namespace hex_subdiv {
 
 		std::vector< VERTEX* > top_verts_tmp, bot_verts_tmp;
 		// top vertices
-		gface = face_vec[86];
+		gface = face_vec[85];
 		gloop = gface->loop()->next();
 		gcoedge = gloop->start();
 		get_vertices_by_coedge(gcoedge, top_verts_tmp); 
 		// bottom vertices
-		gface = face_vec[84];
+		gface = face_vec[83];
 		gloop = gface->loop()->next();
 		gcoedge = gloop->start();
 		get_vertices_by_coedge(gcoedge, bot_verts_tmp);
@@ -455,9 +542,9 @@ namespace hex_subdiv {
 			++top_vitr; ++bot_vitr; ++i;
 		}
  
-		
+
 		//3  
-		gface = face_vec[86];
+		gface = face_vec[85];
 		gedge = gface->loop()->start()->edge();
 		curve* gcurve = &( gedge->geometry()->equation_for_update() ); 
 		size_t vsz = top_verts.size(); 
@@ -473,7 +560,7 @@ namespace hex_subdiv {
 
 
 		// 4
-		gface = face_vec[12];
+		gface = face_vec[11];
 		gloop = gface->loop()->next();
 		gedge = gloop->start()->edge();
 		gcurve = &( gedge->geometry()->equation_for_update() );
@@ -490,7 +577,7 @@ namespace hex_subdiv {
 		}
 
 		// 5
-		gface = face_vec[12];
+		gface = face_vec[11];
 		gloop = gface->loop();
 		gedge = gloop->start()->edge();
 		gcurve = &( gedge->geometry()->equation_for_update() );
@@ -509,7 +596,7 @@ namespace hex_subdiv {
 		// 6
 		vsz = top_verts.size(); 	
 		for (i = 0; i < 2; ++i) {
-			FACE* ftemp = face_vec[i + 1];
+			FACE* ftemp = face_vec[i];
 			EDGE* etemp = ftemp->loop()->start()->next()->next()->edge();
 			gcurve = &(etemp->geometry()->equation_for_update());
 			size_t idx = i + vsz - novar;
@@ -517,12 +604,12 @@ namespace hex_subdiv {
 			double spa_param = gcurve->param( old_pos );
 			SPAposition gpos( gcurve->eval_position( spa_param ) );
 			top_verts.push_back(gpos);
-			
+
 			gpos.set_z( gpos.z() - 7 );
 			bot_verts.push_back(gpos);
 		}
-		
-		gface = face_vec[0];
+
+		gface = face_vec[86];
 		surface* gsurface = &( gface->geometry()->equation_for_update() ); 
 		for (i = 2; i < novar; ++i) {
 			size_t idx = i + vsz - novar;
@@ -538,7 +625,7 @@ namespace hex_subdiv {
 		// 7
 		vsz = top_verts.size(); 
 		for (i = 0; i < 2; ++i) {
-			FACE* ftemp = face_vec[i + 1];
+			FACE* ftemp = face_vec[i];
 			EDGE* etemp = ftemp->loop()->start()->edge();
 			gcurve = &(etemp->geometry()->equation_for_update());
 			size_t idx = i + vsz - novar;
@@ -546,12 +633,12 @@ namespace hex_subdiv {
 			double spa_param = gcurve->param( old_pos );
 			SPAposition gpos( gcurve->eval_position( spa_param ) );
 			top_verts.push_back(gpos);
-			
+
 			gpos.set_z( gpos.z() - 7 ); 
 			bot_verts.push_back(gpos);
 		}
-		
-		gface = face_vec[5];
+
+		gface = face_vec[4];
 		gsurface = &( gface->geometry()->equation_for_update() );
 		for (i = 2; i < novar; ++i) {
 			size_t idx = i + vsz - novar;
@@ -567,17 +654,17 @@ namespace hex_subdiv {
 		// 8
 		vsz = top_verts.size(); 
 		for (i = 0; i < 2; ++i) {
-			FACE* ftemp = face_vec[i + 1];
+			FACE* ftemp = face_vec[i];
 			EDGE* etemp = ftemp->loop()->start()->edge();
-			
+
 			SPAposition gpos( i == 0 ? etemp->start_pos() : etemp->end_pos() );
 			top_verts.push_back(gpos);
-			
+
 			gpos.set_z( gpos.z() - 25 );
 			bot_verts.push_back(gpos);
 		}
-		
-		gface = face_vec[5];
+
+		gface = face_vec[4];
 		gedge = gface->loop()->start()->next()->edge();
 		gcurve = &( gedge->geometry()->equation_for_update() );
 		for (i = 2; i < novar; ++i) {
@@ -594,17 +681,17 @@ namespace hex_subdiv {
 		// 9
 		vsz = top_verts.size(); 
 		for (i = 0; i < 2; ++i) {
-			FACE* ftemp = face_vec[3];
+			FACE* ftemp = face_vec[2];
 			EDGE* etemp = ftemp->loop()->start()->next()->edge();
-			
+
 			SPAposition gpos( i == 0 ? etemp->end_pos() : etemp->start_pos() );
 			top_verts.push_back(gpos);
-			
+
 			gpos.set_z( gpos.z() - 25 );
 			bot_verts.push_back(gpos);
 		}
-		
-		gface = face_vec[0];
+
+		gface = face_vec[86];
 		gcoedge = gface->loop()->start();
 		gedge = gcoedge->next()->next()->edge();
 		gcurve = &( gedge->geometry()->equation_for_update() );
@@ -620,7 +707,7 @@ namespace hex_subdiv {
 		}
 
 		// 10
-		gface = face_vec[4]; 
+		gface = face_vec[3]; 
 		gedge = gface->loop()->start()->edge();
 		gcurve = &( gedge->geometry()->equation_for_update() );
 		vsz = top_verts.size();
@@ -637,25 +724,302 @@ namespace hex_subdiv {
 
 		std::copy(top_verts.begin(), top_verts.end(), std::back_inserter(verts_vec) );
 		std::copy(bot_verts.begin(), bot_verts.end(), std::back_inserter(verts_vec) );
-		
+
 		std::copy(top_spa_verts.begin(), top_spa_verts.end(), std::back_inserter(spa_verts_vec) ); 
 		std::copy(bot_spa_verts.begin(), bot_spa_verts.end(), std::back_inserter(spa_verts_vec) );
 	}
-	
-	void hs_example::get_faces_of_gear( ENTITY* ent, std::vector< FACE* >& face_vec) {
 
-		ENTITY_LIST face_list;
-		check_outcome( api_get_faces(ent, face_list) );
-		face_list.init();
-		FACE* face = static_cast< FACE* >( face_list.first() );
-		while ( face ) {
-			face_vec.push_back(face);
-			face = static_cast< FACE* >( face_list.next() );
-		} 
+	void hs_example::get_vertices_of_gear_compact( std::vector< FACE* >& face_vec, 
+		std::vector< SPAposition >& verts_vec, std::vector< VERTEX* >& spa_verts_vec, size_t& novar) 
+	{
+		FACE* gface;
+		EDGE* gedge;
+		LOOP* gloop;
+		COEDGE* gcoedge;
+
+		std::vector< VERTEX* > top_verts_tmp, bot_verts_tmp;
+		// top vertices
+		gface = face_vec[85];
+		gloop = gface->loop()->next();
+		gcoedge = gloop->start();
+		get_vertices_by_coedge(gcoedge, top_verts_tmp); 
+		// bottom vertices
+		gface = face_vec[83];
+		gloop = gface->loop()->next();
+		gcoedge = gloop->start();
+		get_vertices_by_coedge(gcoedge, bot_verts_tmp);
+		assert( top_verts_tmp.size() == bot_verts_tmp.size() );
+		std::vector< VERTEX* >::iterator bot_vitr = bot_verts_tmp.begin();
+		std::advance(bot_vitr, 68);
+		std::reverse(bot_verts_tmp.begin(), bot_vitr);
+		std::reverse(bot_vitr, bot_verts_tmp.end()); 
+
+		// 1
+		std::vector< VERTEX* > top_spa_verts, bot_spa_verts;
+		std::vector< SPAposition > top_verts, bot_verts;
+		std::vector< VERTEX* >::iterator top_vitr;
+		top_vitr = top_verts_tmp.begin();
+		bot_vitr = bot_verts_tmp.begin();
+		for (size_t i = 0; top_vitr != top_verts_tmp.end() && bot_vitr != bot_verts_tmp.end(); ) {
+			if ( (i & 3) == 1 || (i & 3) == 2) {
+				top_spa_verts.push_back( *top_vitr );
+				bot_spa_verts.push_back( *bot_vitr );   
+				top_verts.push_back( (*top_vitr)->geometry()->coords() );
+				bot_verts.push_back( (*bot_vitr)->geometry()->coords() );
+			}
+			++top_vitr; ++bot_vitr; ++i;
+		}
+		novar = top_spa_verts.size();
+		// 2
+		top_vitr = top_verts_tmp.begin();
+		bot_vitr = bot_verts_tmp.begin();
+		for (i = 0; top_vitr != top_verts_tmp.end() && bot_vitr != bot_verts_tmp.end(); ) {
+			if ( (i & 3) == 0 || (i & 3) == 3) {
+				top_spa_verts.push_back( *top_vitr );
+				bot_spa_verts.push_back( *bot_vitr ); 
+				top_verts.push_back( (*top_vitr)->geometry()->coords() );
+				bot_verts.push_back( (*bot_vitr)->geometry()->coords() );
+			}
+			++top_vitr; ++bot_vitr; ++i;
+		}
+ 
+
+		//3  
+		gface = face_vec[85];
+		gedge = gface->loop()->start()->edge();
+		curve* gcurve = &( gedge->geometry()->equation_for_update() ); 
+		size_t vsz = top_verts.size(); 
+		for (i = 0; i < novar; ++i) {
+			size_t idx = i + vsz - novar;
+			SPAposition v_pos( top_verts[idx] );
+			SPAposition new_pos ( gcurve->eval_position( gcurve->param(v_pos) ) );
+			top_verts.push_back(new_pos);
+
+			new_pos.set_z(new_pos.z() - 10);
+			bot_verts.push_back(new_pos);
+		}
+
+
+		// 4
+		gface = face_vec[11];
+		gloop = gface->loop()->next();
+		gedge = gloop->start()->edge();
+		gcurve = &( gedge->geometry()->equation_for_update() );
+		vsz = top_verts.size(); 
+		for (i = 0; i < novar; ++i) {
+			size_t idx = i + vsz - novar;
+			const SPAposition& old_pos = top_verts[ idx ];
+			double spa_param = gcurve->param( old_pos );
+			SPAposition gpos( gcurve->eval_position( spa_param ) );
+			top_verts.push_back(gpos); 
+
+			gpos.set_z( gpos.z() - 7 );
+			bot_verts.push_back(gpos);
+		}
+
+		gface = face_vec[86];
+		gloop = gface->loop()->next();
+		gedge = gloop->start()->edge();
+		gcurve = &( gedge->geometry()->equation_for_update() );
+		vsz = top_verts.size(); 
+		for (i = 0; i < novar; ++i) {
+			size_t idx = i + vsz - novar;
+			const SPAposition& old_pos = top_verts[ idx ];
+			double spa_param = gcurve->param( old_pos );
+			SPAposition gpos( gcurve->eval_position( spa_param ) );
+			top_verts.push_back(gpos); 
+			
+			gpos.set_z( gpos.z() - 7 );
+			bot_verts.push_back(gpos);
+		}
+
+		gface = face_vec[87];
+		gloop = gface->loop()->next();
+		gedge = gloop->start()->edge();
+		gcurve = &( gedge->geometry()->equation_for_update() );
+		vsz = top_verts.size(); 
+		for (i = 0; i < novar; ++i) {
+			size_t idx = i + vsz - novar;
+			const SPAposition& old_pos = top_verts[ idx ];
+			double spa_param = gcurve->param( old_pos );
+			SPAposition gpos( gcurve->eval_position( spa_param ) );
+			top_verts.push_back(gpos); 
+			
+			gpos.set_z( gpos.z() - 7 );
+			bot_verts.push_back(gpos);
+		}
+
+		gface = face_vec[88];
+		gloop = gface->loop()->next();
+		gedge = gloop->start()->edge();
+		gcurve = &( gedge->geometry()->equation_for_update() );
+		vsz = top_verts.size(); 
+		for (i = 0; i < novar; ++i) {
+			size_t idx = i + vsz - novar;
+			const SPAposition& old_pos = top_verts[ idx ];
+			double spa_param = gcurve->param( old_pos );
+			SPAposition gpos( gcurve->eval_position( spa_param ) );
+			top_verts.push_back(gpos); 
+			
+			gpos.set_z( gpos.z() - 7 );
+			bot_verts.push_back(gpos);
+		}
+
+		// 5
+		gface = face_vec[11];
+		gloop = gface->loop();
+		gedge = gloop->start()->edge();
+		gcurve = &( gedge->geometry()->equation_for_update() );
+		vsz = top_verts.size(); 
+		for (i = 0; i < novar; ++i) {
+			size_t idx = i + vsz - novar;
+			const SPAposition& old_pos = top_verts[idx];
+			double spa_param = gcurve->param( old_pos );
+			SPAposition gpos( gcurve->eval_position( spa_param ) );
+			top_verts.push_back(gpos); 
+
+			gpos.set_z( gpos.z() - 7 );
+			bot_verts.push_back(gpos);
+		}
+
+		// 6
+		vsz = top_verts.size(); 	
+		for (i = 0; i < 2; ++i) {
+			FACE* ftemp = face_vec[i];
+			EDGE* etemp = ftemp->loop()->start()->next()->next()->edge();
+			gcurve = &(etemp->geometry()->equation_for_update());
+			size_t idx = i + vsz - novar;
+			SPAposition old_pos( top_verts[idx] );
+			double spa_param = gcurve->param( old_pos );
+			SPAposition gpos( gcurve->eval_position( spa_param ) );
+			top_verts.push_back(gpos);
+
+			gpos.set_z( gpos.z() - 7 );
+			bot_verts.push_back(gpos);
+		}
+
+		gface = face_vec[89];
+		surface* gsurface = &( gface->geometry()->equation_for_update() ); 
+		for (i = 2; i < novar; ++i) {
+			size_t idx = i + vsz - novar;
+			const SPAposition& old_pos = top_verts[idx];
+			SPApar_pos spa_param = gsurface->param( old_pos );
+			SPAposition gpos( gsurface->eval_position( spa_param ) );
+			top_verts.push_back(gpos);
+
+			gpos.set_z( gpos.z() - 7 );
+			bot_verts.push_back(gpos);
+		}
+
+		// 7
+		vsz = top_verts.size(); 
+		for (i = 0; i < 2; ++i) {
+			FACE* ftemp = face_vec[i];
+			EDGE* etemp = ftemp->loop()->start()->edge();
+			gcurve = &(etemp->geometry()->equation_for_update());
+			size_t idx = i + vsz - novar;
+			SPAposition old_pos ( top_verts[idx] );
+			double spa_param = gcurve->param( old_pos );
+			SPAposition gpos( gcurve->eval_position( spa_param ) );
+			top_verts.push_back(gpos);
+
+			gpos.set_z( gpos.z() - 7 ); 
+			bot_verts.push_back(gpos);
+		}
+
+		gface = face_vec[4];
+		gsurface = &( gface->geometry()->equation_for_update() );
+		for (i = 2; i < novar; ++i) {
+			size_t idx = i + vsz - novar;
+			const SPAposition& old_pos = top_verts[idx];
+			SPApar_pos spa_param = gsurface->param( old_pos );
+			SPAposition gpos( gsurface->eval_position( spa_param ) );
+			top_verts.push_back(gpos);
+
+			gpos.set_z( gpos.z() - 7 );
+			bot_verts.push_back(gpos);
+		}
+
+		// 8
+		vsz = top_verts.size(); 
+		for (i = 0; i < 2; ++i) {
+			FACE* ftemp = face_vec[i];
+			EDGE* etemp = ftemp->loop()->start()->edge();
+
+			SPAposition gpos( i == 0 ? etemp->start_pos() : etemp->end_pos() );
+			top_verts.push_back(gpos);
+
+			gpos.set_z( gpos.z() - 25 );
+			bot_verts.push_back(gpos);
+		}
+
+		gface = face_vec[4];
+		gedge = gface->loop()->start()->next()->edge();
+		gcurve = &( gedge->geometry()->equation_for_update() );
+		for (i = 2; i < novar; ++i) {
+			size_t idx = i + vsz - novar;
+			const SPAposition& old_pos = top_verts[idx];
+			double spa_param = gcurve->param( old_pos );
+			SPAposition gpos( gcurve->eval_position( spa_param ) );
+			top_verts.push_back(gpos);
+
+			gpos.set_z( gpos.z() - 25 );
+			bot_verts.push_back(gpos);
+		}
+
+		// 9
+		vsz = top_verts.size(); 
+		for (i = 0; i < 2; ++i) {
+			FACE* ftemp = face_vec[2];
+			EDGE* etemp = ftemp->loop()->start()->next()->edge();
+
+			SPAposition gpos( i == 0 ? etemp->end_pos() : etemp->start_pos() );
+			top_verts.push_back(gpos);
+
+			gpos.set_z( gpos.z() - 25 );
+			bot_verts.push_back(gpos);
+		}
+
+		gface = face_vec[89];
+		gcoedge = gface->loop()->start();
+		gedge = gcoedge->next()->next()->edge();
+		gcurve = &( gedge->geometry()->equation_for_update() );
+		for (i = 2; i < novar; ++i) {
+			size_t idx = i + vsz - novar;
+			const SPAposition& old_pos = top_verts[idx];
+			double spa_param = gcurve->param( old_pos );
+			SPAposition gpos( gcurve->eval_position( spa_param ) );
+			top_verts.push_back(gpos);
+
+			gpos.set_z( gpos.z() - 25 );
+			bot_verts.push_back(gpos);
+		}
+
+		// 10
+		gface = face_vec[3]; 
+		gedge = gface->loop()->start()->edge();
+		gcurve = &( gedge->geometry()->equation_for_update() );
+		vsz = top_verts.size();
+		for (i = 0; i < novar; ++i) { 
+			size_t idx = i + vsz - novar;
+			const SPAposition& old_pos = top_verts[idx];
+			double spa_param = gcurve->param( old_pos );
+			SPAposition gpos( gcurve->eval_position( spa_param ) );
+			top_verts.push_back(gpos); 
+
+			gpos.set_z( gpos.z() - 25 );
+			bot_verts.push_back(gpos);
+		}
+
+		std::copy(top_verts.begin(), top_verts.end(), std::back_inserter(verts_vec) );
+		std::copy(bot_verts.begin(), bot_verts.end(), std::back_inserter(verts_vec) );
+
+		std::copy(top_spa_verts.begin(), top_spa_verts.end(), std::back_inserter(spa_verts_vec) ); 
+		std::copy(bot_spa_verts.begin(), bot_spa_verts.end(), std::back_inserter(spa_verts_vec) );
 	}
 
 	/** novar: number of vertices a round of gear **/
-	void hs_example::add_vertices_to_model( hs_model& hex_model, 
+	void hs_example::add_vertices_to_model_coarse( hs_model& hex_model, 
 		std::vector< SPAposition >& verts_vec, size_t novar) 
 	{	
 		std::vector< SPAposition >::iterator vitr = verts_vec.begin();
@@ -696,7 +1060,50 @@ namespace hex_subdiv {
 		} // end for level	
 	}
 	
-	void hs_example::add_edges_to_model( hs_model& hex_model, std::vector< FACE* >& face_vec,
+	void hs_example::add_vertices_to_model_compact( hs_model& hex_model, 
+		std::vector< SPAposition >& verts_vec, size_t novar) 
+	{	
+		std::vector< SPAposition >::iterator vitr = verts_vec.begin();
+		for (size_t level = 0; level < 2; ++level) { 		
+			for (size_t ctrl = 0; ctrl < 13; ++ctrl) {
+				for (size_t sz = 0; sz < novar && vitr != verts_vec.end(); ) {
+					vert_type vtype; 
+					switch (ctrl) {
+					case 0: case 1:
+						vtype = CORNER_VERT; break;
+					case 2: case 3: case 7: case 12:
+						vtype = CREASE_VERT; break;
+					case 4: case 5: case 6:
+						vtype = ORDINARY_VERT; break;
+					case 8:
+						if (sz < 2) { vtype = CREASE_VERT;} 
+						else		{ vtype = INNER_VERT;}
+						break;
+					case 9: 
+						if (sz < 2) { vtype = CREASE_VERT;}
+						else		{ vtype = ORDINARY_VERT;}
+						break;
+					case 10: 
+						if (sz < 2) { vtype = CORNER_VERT;}
+						else		{ vtype = CREASE_VERT;}
+						break;
+					case 11:
+						if (sz < 2) { vtype = CORNER_VERT;}
+						else		{ vtype = ORDINARY_VERT;}
+						break;
+					} 
+					
+					SPAposition& spa_pos = *vitr;
+					hs_point vert(spa_pos.x(), spa_pos.y(), spa_pos.z());
+					hex_model.add_vert(vert, vtype);
+					
+					++sz; ++vitr;
+				} // end for sz
+			} // end for ctrl
+		} // end for level	
+	}
+
+	void hs_example::add_edges_to_model_coarse( hs_model& hex_model, std::vector< FACE* >& face_vec,
 		std::vector< VERTEX*>& spa_verts_vec, size_t novar)
 	{
 		const size_t HALF_VERTS_NUM = static_cast< size_t >( hex_model.vert_size() / 2 );
@@ -740,15 +1147,15 @@ namespace hex_subdiv {
 
 					switch (ctrl) {
 					case 0: 
-						spa_face = (level == 0) ? face_vec[86] : face_vec[84]; 
+						spa_face = (level == 0) ? face_vec[85] : face_vec[83]; 
 						spa_edge = spa_face->loop()->start()->edge();
 						etype = CREASE_EDGE; break;
 					case 1: 
-						spa_face = (level == 0) ? face_vec[12] : face_vec[10];
+						spa_face = (level == 0) ? face_vec[11] : face_vec[9];
 						spa_edge = spa_face->loop()->next()->start()->edge();
 						etype = CREASE_EDGE; break;
 					case 2:
-						spa_face = (level == 0) ? face_vec[12] : face_vec[10];
+						spa_face = (level == 0) ? face_vec[11] : face_vec[9];
 						spa_edge = spa_face->loop()->start()->edge();
 						etype = CREASE_EDGE; break;
 					case 3:
@@ -756,7 +1163,7 @@ namespace hex_subdiv {
 						else	     { etype = INNER_EDGE; } 
 						break;
 					case 5: { 
-						spa_face = (level == 0) ? face_vec[4] : face_vec[8]; 
+						spa_face = (level == 0) ? face_vec[3] : face_vec[7]; 
 						COEDGE* spa_coedge = (level == 0) 
 							? spa_face->loop()->next()->start()->next()->next()
 							: spa_face->loop()->start();
@@ -764,7 +1171,7 @@ namespace hex_subdiv {
 						etype = CREASE_EDGE; break;
 							}
 					case 7:
-						spa_face = (level == 0) ? face_vec[4] : face_vec[8];
+						spa_face = (level == 0) ? face_vec[3] : face_vec[7];
 						spa_edge = (level == 0) ? spa_face->loop()->start()->edge() 
 							: spa_face->loop()->next()->start()->edge();
 						etype = CREASE_EDGE; break;
@@ -773,8 +1180,8 @@ namespace hex_subdiv {
 					case 6:
 						if (st == 0) { 
 							spa_edge = (level == 0)
-								? face_vec[3]->loop()->start()->next()->edge()
-								: face_vec[3]->loop()->start()->next()->next()->next()->edge();
+								? face_vec[2]->loop()->start()->next()->edge()
+								: face_vec[2]->loop()->start()->next()->next()->next()->edge();
 							etype = CREASE_EDGE;  
 						} else { etype = ORDINARY_EDGE; }
 						break;
@@ -813,8 +1220,8 @@ namespace hex_subdiv {
 						if ( st < 2 ) { 
 							etype = CREASE_EDGE; 
 							spa_edge = (st == 0) 
-								? face_vec[1]->loop()->start()->edge() 
-								: face_vec[2]->loop()->start()->edge();
+								? face_vec[0]->loop()->start()->edge() 
+								: face_vec[1]->loop()->start()->edge();
 						} else { etype = ORDINARY_EDGE;}
 						break;
 					case 7:
@@ -822,12 +1229,12 @@ namespace hex_subdiv {
 							etype = CREASE_EDGE; 
 							if (level == 0) {
 								spa_edge = (st == 0) 
-									? face_vec[1]->loop()->start()->next()->edge() 
-									: face_vec[2]->loop()->start()->next()->next()->next()->edge();
+									? face_vec[0]->loop()->start()->next()->edge() 
+									: face_vec[1]->loop()->start()->next()->next()->next()->edge();
 							} else if (level == 1) {
 								spa_edge = (st == 0) 
-									? face_vec[1]->loop()->start()->next()->next()->next()->edge() 
-									: face_vec[2]->loop()->start()->next()->edge();
+									? face_vec[0]->loop()->start()->next()->next()->next()->edge() 
+									: face_vec[1]->loop()->start()->next()->edge();
 							}
 						} else { etype = ORDINARY_EDGE;} 
 						break;
@@ -840,7 +1247,7 @@ namespace hex_subdiv {
 				EDGE* spa_edge = NULL;
 				edge_type etype = INNER_EDGE;
 				if ( st < 2 ) {
-					spa_edge = face_vec[st + 1]->loop()->start()->next()->next()->edge();
+					spa_edge = face_vec[st]->loop()->start()->next()->next()->edge();
 					etype = CREASE_EDGE;
 				}
 				hex_model.add_edge(vidx, vidx - 3 * novar, spa_edge, etype);
@@ -871,13 +1278,13 @@ namespace hex_subdiv {
 					etype = INNER_EDGE; break;
 				case 5:
 					if (st < 2) {
-						spa_edge = face_vec[st + 1]->loop()->start()->next()->next()->edge();
+						spa_edge = face_vec[st]->loop()->start()->next()->next()->edge();
 						etype = CREASE_EDGE;
 					} else { etype = INNER_EDGE; }
 					break;
 				case 6:
 					if (st < 2) {
-						spa_edge = face_vec[st + 1]->loop()->start()->edge();
+						spa_edge = face_vec[st]->loop()->start()->edge();
 						etype = CREASE_EDGE;
 					} else { etype = ORDINARY_EDGE; }
 					break;
@@ -889,14 +1296,207 @@ namespace hex_subdiv {
  
 	}
 	
-	void hs_example::add_faces_to_model( hs_model& hex_model, std::vector< FACE* >& face_vec, 
+	void hs_example::add_edges_to_model_compact( hs_model& hex_model, std::vector< FACE* >& face_vec,
+		std::vector< VERTEX*>& spa_verts_vec, size_t novar)
+	{
+		const size_t HALF_VERTS_NUM = static_cast< size_t >( hex_model.vert_size() / 2 );
+		size_t vidx = 0; 
+		for (size_t level = 0; level < 2; ++level) { 
+			// 1  X---X---X
+			for (size_t st = 0; st < novar; st += 2, vidx += 2) {
+				size_t end, sidx, eidx;
+				end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
+				sidx = st + level * novar * 2;
+				eidx = (st + 1 == novar) ? sidx + 1 - novar : sidx + 1; 
+				EDGE* spa_edge = get_edge_by_2_vert(spa_verts_vec[sidx], spa_verts_vec[eidx]);
+				assert( spa_edge != NULL );
+				hex_model.add_edge(vidx, end, spa_edge, CREASE_EDGE);
+			} 
+
+			// 2  
+			for (st = 0; st < novar; ++st, ++vidx) { 
+				size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
+				if (!(st & 1)) {  
+					hex_model.add_edge(vidx, end, NULL, ORDINARY_EDGE);
+				} else { 
+					size_t sidx, eidx;
+					sidx = st + novar + level * novar * 2;
+					eidx = (st + 1 == novar) ? sidx + 1 - novar : sidx + 1; 
+					EDGE* spa_edge = get_edge_by_2_vert(spa_verts_vec[sidx], spa_verts_vec[eidx]);
+					assert( spa_edge != NULL );
+					hex_model.add_edge(vidx, end, spa_edge, CREASE_EDGE);
+				}
+			} 
+
+			//
+			for (size_t ctrl = 0; ctrl < 11; ++ctrl) { 
+				
+				if (7 == ctrl || 8 == ctrl) { st = 1; ++vidx;} 
+				else { st = 0; }
+				for (; st < novar; ++st, ++vidx) {
+					edge_type etype; 
+					EDGE* spa_edge = NULL;
+					FACE* spa_face = NULL;
+
+					switch (ctrl) {
+					case 0: 
+						spa_face = (level == 0) ? face_vec[85] : face_vec[83]; 
+						spa_edge = spa_face->loop()->start()->edge();
+						etype = CREASE_EDGE; break;
+					case 1: 
+						spa_face = (level == 0) ? face_vec[11] : face_vec[9];
+						spa_edge = spa_face->loop()->next()->start()->edge();
+						etype = CREASE_EDGE; break;
+					case 5:
+						spa_face = (level == 0) ? face_vec[11] : face_vec[9];
+						spa_edge = spa_face->loop()->start()->edge();
+						etype = CREASE_EDGE; break;
+					case 6:
+						if (st == 0) { etype = ORDINARY_EDGE; }
+						else	     { etype = INNER_EDGE; } 
+						break;
+					case 8: { 
+						spa_face = (level == 0) ? face_vec[3] : face_vec[7]; 
+						COEDGE* spa_coedge = (level == 0) 
+							? spa_face->loop()->next()->start()->next()->next()
+							: spa_face->loop()->start();
+						spa_edge = spa_coedge->next()->edge();
+						etype = CREASE_EDGE; break;
+							}
+					case 10:
+						spa_face = (level == 0) ? face_vec[3] : face_vec[7];
+						spa_edge = (level == 0) ? spa_face->loop()->start()->edge() 
+							: spa_face->loop()->next()->start()->edge();
+						etype = CREASE_EDGE; break;
+					case 2: case 3: case 4: case 7: 
+						etype = ORDINARY_EDGE; break;
+					case 9:
+						if (st == 0) { 
+							spa_edge = (level == 0)
+								? face_vec[2]->loop()->start()->next()->edge()
+								: face_vec[2]->loop()->start()->next()->next()->next()->edge();
+							etype = CREASE_EDGE;  
+						} else { etype = ORDINARY_EDGE; }
+						break;
+					}
+					size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1; 
+					hex_model.add_edge(vidx, end, spa_edge, etype);
+				}  
+			}
+			//     X
+			//	   |
+			//     X
+			//     |
+			//     X
+			vidx = level * HALF_VERTS_NUM;
+			for (ctrl = 0; ctrl < 12; ++ctrl) { 
+				for (st = 0; st < novar; ++st, ++vidx) {
+					edge_type etype;
+					EDGE* spa_edge = NULL;
+					switch ( ctrl ) {
+					case 0: 
+						{
+							size_t spa_idx = st + level * novar * 2;
+							spa_edge = get_edge_by_2_vert(spa_verts_vec[spa_idx], spa_verts_vec[spa_idx + novar]);
+							assert ( spa_edge != NULL );
+							etype = CREASE_EDGE; break;
+						}
+					case 1: case 2: case 3: case 4: case 5: case 6: case 11:
+						etype = ORDINARY_EDGE; break;
+					case 7:
+						etype = INNER_EDGE; break;
+					case 8:
+						if ( st < 2 ) { etype = ORDINARY_EDGE; }
+						else	      { etype = INNER_EDGE; }
+						break;
+					case 9: 
+						if ( st < 2 ) { 
+							etype = CREASE_EDGE; 
+							spa_edge = (st == 0) 
+								? face_vec[0]->loop()->start()->edge() 
+								: face_vec[1]->loop()->start()->edge();
+						} else { etype = ORDINARY_EDGE;}
+						break;
+					case 10:
+						if ( st < 2 ) { 
+							etype = CREASE_EDGE; 
+							if (level == 0) {
+								spa_edge = (st == 0) 
+									? face_vec[0]->loop()->start()->next()->edge() 
+									: face_vec[1]->loop()->start()->next()->next()->next()->edge();
+							} else if (level == 1) {
+								spa_edge = (st == 0) 
+									? face_vec[0]->loop()->start()->next()->next()->next()->edge() 
+									: face_vec[1]->loop()->start()->next()->edge();
+							}
+						} else { etype = ORDINARY_EDGE;} 
+						break;
+					}
+					hex_model.add_edge(vidx, vidx + novar, spa_edge, etype);
+				} 
+			}	
+
+			for (st = 0, vidx -= novar; st < novar; ++st, ++vidx) {
+				EDGE* spa_edge = NULL;
+				edge_type etype = INNER_EDGE;
+				if ( st < 2 ) {
+					spa_edge = face_vec[st]->loop()->start()->next()->next()->edge();
+					etype = CREASE_EDGE;
+				}
+				hex_model.add_edge(vidx, vidx - 3 * novar, spa_edge, etype);
+			} 
+		
+			for (st = 0; st < novar; ++st, ++vidx) {  
+				hex_model.add_edge(vidx, vidx - 5 * novar, NULL, ORDINARY_EDGE);
+			} 			
+		}
+
+		//  X
+		//  |\
+		//1L| \<--this
+		//  X  X
+		//  |  | 2L
+		std::vector< EDGE* > vtc1_edges, vtc2_edges;
+		vidx = 0;
+		for (size_t ctrl = 0; ctrl < 10; ++ctrl) {
+			for (size_t st = 0; st < novar; ) {
+				edge_type etype; 
+				EDGE* spa_edge = NULL;
+				switch(ctrl) {
+				case 0: case 1:
+					spa_edge = get_edge_by_2_vert(spa_verts_vec[vidx], spa_verts_vec[vidx + 2 * novar]);
+					assert ( spa_edge != NULL );
+					etype = CREASE_EDGE; break;
+				case 2: case 3: case 4: case 5: case 6: case 7: 
+					etype = INNER_EDGE; break;
+				case 8:
+					if (st < 2) {
+						spa_edge = face_vec[st]->loop()->start()->next()->next()->edge();
+						etype = CREASE_EDGE;
+					} else { etype = INNER_EDGE; }
+					break;
+				case 9:
+					if (st < 2) {
+						spa_edge = face_vec[st]->loop()->start()->edge();
+						etype = CREASE_EDGE;
+					} else { etype = ORDINARY_EDGE; }
+					break;
+				}
+				hex_model.add_edge(vidx, vidx + HALF_VERTS_NUM, spa_edge, etype);
+				++st; ++vidx;
+			} 
+		}
+ 
+	}
+
+	void hs_example::add_faces_to_model_coarse( hs_model& hex_model, std::vector< FACE* >& face_vec, 
 		std::vector< VERTEX* >& spa_verts_vec, size_t novar) 
 	{
 		const size_t HALF_VERTS_NUM = static_cast< size_t >( hex_model.vert_size() / 2);
 		size_t vidx = 0;
 		for (size_t level = 0; level < 2; ++level) {
 			vidx = level * HALF_VERTS_NUM; 
-			FACE* spa_face = (0 == level) ? face_vec[86] : face_vec[84];
+			FACE* spa_face = (0 == level) ? face_vec[85] : face_vec[83];
 			for(size_t st = 0; st < novar; st += 2, vidx += 2) {
 				size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
 				size_t verts[] = {vidx, end, vidx + novar, end + novar};
@@ -907,12 +1507,12 @@ namespace hex_subdiv {
 				face_type ftype;
 				spa_face = NULL;
 				switch (ctrl) {
-				case 0: spa_face = (0 == level) ? face_vec[86] : face_vec[84]; ftype = BORDER_FACE; break;
-				case 1: spa_face = (0 == level) ? face_vec[11] : face_vec[9]; ftype = BORDER_FACE; break;
-				case 2: spa_face = (0 == level) ? face_vec[12] : face_vec[10]; ftype = BORDER_FACE; break;	
-				case 5: spa_face = face_vec[5]; ftype = BORDER_FACE; break;
+				case 0: spa_face = (0 == level) ? face_vec[85] : face_vec[83]; ftype = BORDER_FACE; break;
+				case 1: spa_face = (0 == level) ? face_vec[10] : face_vec[8]; ftype = BORDER_FACE; break;
+				case 2: spa_face = (0 == level) ? face_vec[11] : face_vec[9]; ftype = BORDER_FACE; break;	
+				case 5: spa_face = face_vec[4]; ftype = BORDER_FACE; break;
 				case 6: case 7:
-					spa_face = (0 == level) ? face_vec[4] : face_vec[8]; ftype = BORDER_FACE; break;
+					spa_face = (0 == level) ? face_vec[3] : face_vec[7]; ftype = BORDER_FACE; break;
 				case 3: case 4:
 					ftype = INNER_FACE; break;
 				}
@@ -929,12 +1529,12 @@ namespace hex_subdiv {
 			for(st = 0, vidx -= novar; st < novar; ++st, ++vidx) {
 				size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
 				size_t verts[] = {vidx, end, vidx - 3*novar, end - 3*novar};
-				FACE* spa_face = (st == 0) ? face_vec[3] : NULL;
+				FACE* spa_face = (st == 0) ? face_vec[2] : NULL;
 				face_type ftype = (st == 0) ? BORDER_FACE : INNER_FACE;
 				hex_model.add_face_by_verts(verts,4,spa_face,ftype);
 			}
 			
-			spa_face = (0 == level) ? face_vec[6] : face_vec[7];
+			spa_face = (0 == level) ? face_vec[5] : face_vec[6];
 			for(st = 0; st < novar; ++st, ++vidx) {
 				size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
 				size_t verts[] = {vidx, end, vidx - 5*novar, end - 5*novar};
@@ -974,11 +1574,11 @@ namespace hex_subdiv {
 				case 0: case 1: case 2:
 					ftype = INNER_FACE; break;
 				case 3:
-					if (st == 0) { spa_face = face_vec[3]; ftype = BORDER_FACE; }
+					if (st == 0) { spa_face = face_vec[2]; ftype = BORDER_FACE; }
 					else { ftype = INNER_FACE; }
 					break;
 				case 4:
-					spa_face = face_vec[5]; ftype = BORDER_FACE; break;
+					spa_face = face_vec[4]; ftype = BORDER_FACE; break;
 				} 
 				size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1; 
 				size_t verts[] = {vidx, end, vidx + HALF_VERTS_NUM, end + HALF_VERTS_NUM};
@@ -1002,7 +1602,7 @@ namespace hex_subdiv {
 				case 5:
 					if (st < 2) {
 						ftype = BORDER_FACE;
-						spa_face = face_vec[st + 1]; 
+						spa_face = face_vec[st]; 
 					} else { ftype = INNER_FACE; }
 					break;
 				}
@@ -1026,7 +1626,7 @@ namespace hex_subdiv {
 			FACE* spa_face = NULL;
 			if (st < 2) {
 				ftype = BORDER_FACE;
-				spa_face = face_vec[st + 1];
+				spa_face = face_vec[st];
 			} else { ftype = INNER_FACE; } 
 			size_t verts[] = {vidx, vidx + novar, vidx + 2*novar, vidx + 3*novar};
 			hex_model.add_face_by_verts(verts,4,spa_face,ftype);
@@ -1037,7 +1637,156 @@ namespace hex_subdiv {
 		}
 	}
 	
-	void hs_example::add_cells_to_model( hs_model& hex_model, size_t novar) {
+	void hs_example::add_faces_to_model_compact( hs_model& hex_model, std::vector< FACE* >& face_vec, 
+		std::vector< VERTEX* >& spa_verts_vec, size_t novar) 
+	{
+		const size_t HALF_VERTS_NUM = static_cast< size_t >( hex_model.vert_size() / 2);
+		size_t vidx = 0;
+		for (size_t level = 0; level < 2; ++level) {
+			vidx = level * HALF_VERTS_NUM; 
+			FACE* spa_face = (0 == level) ? face_vec[85] : face_vec[83];
+			for(size_t st = 0; st < novar; st += 2, vidx += 2) {
+				size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
+				size_t verts[] = {vidx, end, vidx + novar, end + novar};
+				hex_model.add_face_by_verts(verts,4,spa_face,BORDER_FACE);
+			}
+			
+			for (size_t ctrl = 0; ctrl < 11; ++ctrl) { 
+				face_type ftype;
+				spa_face = NULL;
+				switch (ctrl) {
+				case 0: spa_face = (0 == level) ? face_vec[85] : face_vec[83]; ftype = BORDER_FACE; break;
+				case 1: spa_face = (0 == level) ? face_vec[10] : face_vec[8]; ftype = BORDER_FACE; break;
+				case 2: case 3: case 4: case 5:
+					spa_face = (0 == level) ? face_vec[11] : face_vec[9]; ftype = BORDER_FACE; break;	
+				case 8: spa_face = face_vec[4]; ftype = BORDER_FACE; break;
+				case 9: case 10:
+					spa_face = (0 == level) ? face_vec[3] : face_vec[7]; ftype = BORDER_FACE; break;
+				case 6: case 7:
+					ftype = INNER_FACE; break;
+				}
+				 
+				if ( 9 == ctrl || 8 == ctrl || 7 == ctrl ) { ++vidx; st = 1;} 
+				else { st = 0; }
+				for(; st < novar; ++st, ++vidx) {
+					size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
+					size_t verts[] = {vidx, end, vidx + novar, end + novar};
+					hex_model.add_face_by_verts(verts,4,spa_face,ftype);
+				} 
+			}  
+
+			for(st = 0, vidx -= novar; st < novar; ++st, ++vidx) {
+				size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
+				size_t verts[] = {vidx, end, vidx - 3*novar, end - 3*novar};
+				FACE* spa_face = (st == 0) ? face_vec[2] : NULL;
+				face_type ftype = (st == 0) ? BORDER_FACE : INNER_FACE;
+				hex_model.add_face_by_verts(verts,4,spa_face,ftype);
+			}
+			
+			spa_face = (0 == level) ? face_vec[5] : face_vec[6];
+			for(st = 0; st < novar; ++st, ++vidx) {
+				size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
+				size_t verts[] = {vidx, end, vidx - 5*novar, end - 5*novar};
+				hex_model.add_face_by_verts(verts,4,spa_face,BORDER_FACE);
+			}		
+		}
+
+		vidx = 0;
+		for(size_t st = 0; st < novar; st += 2, vidx += 2) {
+			size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
+			size_t verts[] = {vidx, end, vidx + HALF_VERTS_NUM, end + HALF_VERTS_NUM};
+			FACE* spa_face = get_face_by_2_vert(spa_verts_vec[vidx], spa_verts_vec[end + 2 * novar]);
+			assert ( spa_face != NULL );
+			hex_model.add_face_by_verts(verts,4,spa_face,BORDER_FACE);
+		}
+
+		for(st = 0; st < novar; ++st, ++vidx) {
+			size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
+			size_t verts[] = {vidx, end, vidx + HALF_VERTS_NUM, end + HALF_VERTS_NUM};
+			if (st & 1) {
+				FACE* spa_face = get_face_by_2_vert(spa_verts_vec[vidx], spa_verts_vec[end + 2 * novar]);
+				assert ( spa_face != NULL );
+				hex_model.add_face_by_verts(verts,4,spa_face,BORDER_FACE);
+			} else {
+				hex_model.add_face_by_verts(verts,4,NULL,INNER_FACE);
+			}
+		}
+		
+		for (size_t ctrl = 0; ctrl < 8; ++ctrl) {
+		
+			if ( 7 == ctrl ) { ++vidx; st = 1;}
+			else { st = 0; }
+			for(; st < novar; ++st, ++vidx) {
+				face_type ftype; 
+				FACE* spa_face = NULL; 
+				switch ( ctrl ) {
+				case 0: case 1: case 2: case 3: case 4: case 5:
+					ftype = INNER_FACE; break;
+				case 6:
+					if (st == 0) { spa_face = face_vec[2]; ftype = BORDER_FACE; }
+					else { ftype = INNER_FACE; }
+					break;
+				case 7:
+					spa_face = face_vec[4]; ftype = BORDER_FACE; break;
+				} 
+				size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1; 
+				size_t verts[] = {vidx, end, vidx + HALF_VERTS_NUM, end + HALF_VERTS_NUM};
+				hex_model.add_face_by_verts(verts,4,spa_face,ftype);
+			}
+		}
+		 
+		vidx = 0;
+		for (ctrl = 0; ctrl < 9; ++ctrl) {
+			for (st = 0; st < novar; ++st, ++vidx) {
+				face_type ftype; 
+				FACE* spa_face = NULL;
+				switch ( ctrl ) {
+				case 0:
+					ftype = BORDER_FACE;
+					spa_face = get_face_by_2_vert(spa_verts_vec[vidx], spa_verts_vec[vidx + 3 * novar]);
+					assert ( spa_face != NULL );
+					break;
+				case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+					ftype = INNER_FACE; break;
+				case 8:
+					if (st < 2) {
+						ftype = BORDER_FACE;
+						spa_face = face_vec[st]; 
+					} else { ftype = INNER_FACE; }
+					break;
+				}
+				size_t verts[] = {vidx, vidx + novar, vidx + HALF_VERTS_NUM, vidx + novar + HALF_VERTS_NUM};
+			    hex_model.add_face_by_verts(verts,4,spa_face,ftype);
+			}
+		}
+		
+		
+		for (st = 0, vidx -= 2*novar; st < novar; ++st, ++vidx) {
+			size_t verts[] = {vidx, vidx + novar, vidx + 4*novar, vidx + 5*novar}; 
+			hex_model.add_face_by_verts(verts,4,NULL,INNER_FACE);
+			
+			size_t bot_vidx = vidx + HALF_VERTS_NUM;
+			size_t bot_verts[] = {bot_vidx, bot_vidx + novar, bot_vidx + 4*novar, bot_vidx + 5*novar};
+			hex_model.add_face_by_verts(bot_verts,4,NULL,INNER_FACE);
+		}
+		
+		for (st = 0; st < novar; ++st, ++vidx) {
+			face_type ftype;
+			FACE* spa_face = NULL;
+			if (st < 2) {
+				ftype = BORDER_FACE;
+				spa_face = face_vec[st];
+			} else { ftype = INNER_FACE; } 
+			size_t verts[] = {vidx, vidx + novar, vidx + 2*novar, vidx + 3*novar};
+			hex_model.add_face_by_verts(verts,4,spa_face,ftype);
+
+			size_t bot_vidx = vidx + HALF_VERTS_NUM;
+			size_t bot_verts[] = {bot_vidx, bot_vidx + novar, bot_vidx + 2*novar, bot_vidx + 3*novar};
+			hex_model.add_face_by_verts(bot_verts,4,spa_face,ftype);
+		}
+	}
+
+	void hs_example::add_cells_to_model_coarse( hs_model& hex_model, size_t novar) {
 	
 		const size_t HALF_VERTS_NUM = static_cast< size_t >( hex_model.vert_size() / 2 );
 		size_t vidx = 0; 
@@ -1088,24 +1837,56 @@ namespace hex_subdiv {
 			hex_model.add_cell_by_verts(bot_verts,8);	
 		}
 	}
-	
-	FACE* hs_example::get_face_by_2_vert( VERTEX* v1, VERTEX* v2) {
-		if ( !v1 || !v2 ) return NULL;
-		ENTITY_LIST face_list_1, face_list_2;
-		check_outcome( api_get_faces(v1, face_list_1) );
-		check_outcome( api_get_faces(v2, face_list_2) );
-		face_list_1.init(); face_list_2.init();
-		FACE* face1 = static_cast< FACE* >( face_list_1.first() );
-		while ( face1 ) {
-			FACE* face2 = static_cast< FACE* >( face_list_2.first() );
-			while ( face2 ) {
-				if ( face1 == face2 ) return face1;
-				face2 = static_cast< FACE* >( face_list_2.next() );
+
+	void hs_example::add_cells_to_model_compact( hs_model& hex_model, size_t novar) {
+		
+		const size_t HALF_VERTS_NUM = static_cast< size_t >( hex_model.vert_size() / 2 );
+		size_t vidx = 0; 
+		for (size_t ctrl = 0; ctrl < 9; ++ctrl) {
+			size_t st;
+			if ( 8 == ctrl ) { ++vidx; st = 1;}
+			else { st = 0; }
+			while ( st < novar ) {
+				size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
+				size_t verts[] = {vidx, end, vidx + novar, end + novar,
+					vidx + HALF_VERTS_NUM, end + HALF_VERTS_NUM, 
+					vidx + novar + HALF_VERTS_NUM, end + novar + HALF_VERTS_NUM
+				};
+				hex_model.add_cell_by_verts(verts,8);
+				if ( ctrl == 0) { st += 2; vidx += 2; }
+				else { ++st; ++vidx; }
 			}
-			face1 = static_cast< FACE* >( face_list_1.next() );
 		}
-
-		return NULL;
+		vidx -= 2*novar;
+		for (size_t st = 0; st < novar; ++st, ++vidx) {
+			size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
+			size_t verts[] = {vidx, end, vidx + novar, end + novar,
+				vidx + 4*novar, end + 4*novar, 
+				vidx + 5*novar, end + 5*novar};
+			hex_model.add_cell_by_verts(verts,8);
+			
+			size_t bot_vidx = vidx + HALF_VERTS_NUM;
+			end += HALF_VERTS_NUM;
+			size_t bot_verts[] = {bot_vidx, end, bot_vidx + novar, end + novar,
+				bot_vidx + 4*novar, end + 4*novar, 
+				bot_vidx + 5*novar, end + 5*novar
+			};
+			hex_model.add_cell_by_verts(bot_verts,8);			
+		}
+		
+		for (st = 1, ++vidx; st < novar; ++st, ++vidx) {
+			size_t end = (st + 1 == novar) ? vidx - novar + 1 : vidx + 1;
+			size_t verts[] = {vidx, end, vidx + novar, end + novar,
+				vidx + 2*novar, end + 2*novar, 
+				vidx + 3*novar, end + 3*novar};
+			hex_model.add_cell_by_verts(verts,8);
+			
+			size_t bot_vidx = vidx + HALF_VERTS_NUM;
+			end += HALF_VERTS_NUM;
+			size_t bot_verts[] = {bot_vidx, end, bot_vidx + novar, end + novar,
+				bot_vidx + 2*novar, end + 2*novar, 
+				bot_vidx + 3*novar, end + 3*novar};
+			hex_model.add_cell_by_verts(bot_verts,8);	
+		}
 	}
-
 } // namespace

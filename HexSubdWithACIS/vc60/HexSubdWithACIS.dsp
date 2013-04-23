@@ -89,6 +89,10 @@ SOURCE=..\src\cpp\acis_mgr.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\cpp\global_def.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\cpp\hs_cell.cpp
 # End Source File
 # Begin Source File
@@ -130,6 +134,10 @@ SOURCE=..\example\main.cpp
 # Begin Source File
 
 SOURCE=..\src\include\acis_mgr.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\include\global_def.h
 # End Source File
 # Begin Source File
 
