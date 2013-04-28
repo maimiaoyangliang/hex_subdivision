@@ -1,7 +1,14 @@
 #ifndef HS_POINT_H_
 #define HS_POINT_H_
 
+#include <CASSERT>
+#include "hex_subdiv.h"
+
 namespace hex_subdiv {
+
+// absolute value
+#define ABS( var ) ((var) < 0 ? (-(var)) : (var))
+#define EPSILON (1.0e-20)
 	
 	class hs_point {
 		
@@ -39,16 +46,34 @@ namespace hex_subdiv {
 		double _x, _y, _z;
 	};
 	
-	hs_point operator+ (const hs_point&, const hs_point&);
-	hs_point operator- (const hs_point&, const hs_point&);
-	
-	hs_point operator* (const hs_point&, double);
-	hs_point operator* (double, const hs_point&);
-	
-	hs_point operator/ (const hs_point&, double);
 
-	bool operator== (const hs_point&, const hs_point&);
 	
+	inline hs_point operator+ (const hs_point& p1, const hs_point& p2) {
+		return hs_point(p1.x() + p2.x(), p1.y() + p2.y(), p1.z() + p2.z());
+	}
+	
+	inline hs_point operator- (const hs_point& p1, const hs_point& p2) {
+		return hs_point(p1.x() - p2.x(), p1.y() - p2.y(), p1.z() - p2.z());
+	}
+	
+	inline hs_point operator* (const hs_point& p, double d) {
+		return hs_point(p.x() * d, p.y() * d, p.z() * d);
+	}
+	
+	inline hs_point operator* (double d, const hs_point& p) {
+		return p * d;
+	}
+	
+	inline hs_point operator/ (const hs_point& p, double d) {
+		assert( d > EPSILON || d < -EPSILON);
+		return p * ( 1 / d );
+	}
+	
+	inline bool operator== (const hs_point& p1, const hs_point& p2) {
+		return (ABS(p1.x() - p2.x()) < EPSILON) 
+			&& (ABS(p1.y() - p2.y()) < EPSILON) 
+			&& (ABS(p1.z() - p2.z()) < EPSILON);
+	}
 	
 } // namespace
 

@@ -79,12 +79,13 @@ namespace hex_subdiv {
 
 		void write_vert(const char*) const;
 		void write_edge(const char*) const;
-		void save_file(const char*, const char* = "obj") const; 
+		void save_file(const char*, bool = false, double = 0.01, double = dlimit, 
+			double = dlimit, double = dlimit, const char* = "obj") const; 
 		void check_face() const;
 		void check_edge() const; 
 		
 	private:
-		void sort_edge_of_face(size_t[], size_t) const;
+		void sort_vert_of_face(size_t[], size_t) const;
 
 	private:
 		vert_vector vertices;

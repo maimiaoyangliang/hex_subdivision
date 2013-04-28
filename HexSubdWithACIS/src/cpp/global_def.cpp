@@ -52,9 +52,10 @@ void test_gear_coarse() {
 	init_mesh.add(spa_model);
 	acis.save_sat_file("..\\model\\gear\\sat\\coarse_init_mesh.sat", init_mesh);
 
-	const size_t NUM_OF_SUB = 1;
+	const size_t NUM_OF_SUB = 2;
 	std::stringstream ss;
 	std::string itos;
+	double coeff = 0.1;
 	/** no laplacian smoothing **/
 	{
 		hex_subdiv::hs_subdiv sub(&hex_model);
@@ -71,7 +72,13 @@ void test_gear_coarse() {
 			/** save model to .obj file **/
 			std::string obj_path("..\\model\\gear\\obj\\coarse_nolap_sub_");
 			obj_path += to_string(s + 1) + ".obj";
-			sub.model()->save_file(obj_path.c_str(), "obj");
+			sub.model()->save_file(obj_path.c_str());
+
+			std::string obj_split_path("..\\model\\gear\\obj\\coarse_nolap_split_sub_");
+			obj_split_path += to_string(s + 1) + ".obj";
+			double xlimit = std::numeric_limits<double>::max();
+			coeff *= 0.1;
+			sub.model()->save_file(obj_split_path.c_str(), true, coeff, xlimit, 0);
 			/** save model to .sat file **/
 			ENTITY_LIST sublist_1;
 			sub.model()->acis_wire(sublist_1);
@@ -83,6 +90,7 @@ void test_gear_coarse() {
 	}
 	/** laplacian smoothing **/
 	{
+		coeff = 0.1;
 		hex_subdiv::hs_subdiv sub(&hex_model);
 		for (size_t s = 0; s < NUM_OF_SUB; ++s) {
 			sub.inter_subdiv();
@@ -98,7 +106,13 @@ void test_gear_coarse() {
 			/** save model to .obj file **/
 			std::string obj_path("..\\model\\gear\\obj\\coarse_sub_");
 			obj_path += to_string(s + 1) + ".obj";
-			sub.model()->save_file(obj_path.c_str(), "obj");
+			sub.model()->save_file(obj_path.c_str());
+
+			std::string obj_split_path("..\\model\\gear\\obj\\coarse_split_sub_");
+			obj_split_path += to_string(s + 1) + ".obj";
+			double xlimit = std::numeric_limits<double>::max();
+			coeff *= 0.1;
+			sub.model()->save_file(obj_split_path.c_str(), true, coeff, xlimit, 0);
 			/** save model to .sat file **/
 			ENTITY_LIST sublist_1;
 			sub.model()->acis_wire(sublist_1);
@@ -136,6 +150,7 @@ void test_gear_compact() {
 	const size_t NUM_OF_SUB = 2;
 	std::stringstream ss;
 	std::string itos;
+	double coeff = 0.1;
 	/** no laplacian smoothing **/
 	{
 		hex_subdiv::hs_subdiv sub(&hex_model);
@@ -152,7 +167,13 @@ void test_gear_compact() {
 			/** save model to .obj file **/
 			std::string obj_path("..\\model\\gear\\obj\\compact_nolap_sub_");
 			obj_path += to_string(s + 1) + ".obj";
-			sub.model()->save_file(obj_path.c_str(), "obj");
+			sub.model()->save_file(obj_path.c_str());
+
+			std::string obj_split_path("..\\model\\gear\\obj\\compact_nolap_split_sub_");
+			obj_split_path += to_string(s + 1) + ".obj";
+			double xlimit = std::numeric_limits<double>::max();
+			coeff *= 0.1;
+			sub.model()->save_file(obj_split_path.c_str(), true, coeff, xlimit, 0);
 			/** save model to .sat file **/
 			ENTITY_LIST sublist_1;
 			sub.model()->acis_wire(sublist_1);
@@ -162,9 +183,9 @@ void test_gear_compact() {
 			acis.save_sat_file(sat_file.c_str(), sublist_1);
 		}
 	}
-	
 	/** laplacian smoothing **/
 	{
+		coeff = 0.1;
 		hex_subdiv::hs_subdiv sub(&hex_model);
 		for (size_t s = 0; s < NUM_OF_SUB; ++s) {
 			sub.inter_subdiv();
@@ -180,7 +201,13 @@ void test_gear_compact() {
 			/** save model to .obj file **/
 			std::string obj_path("..\\model\\gear\\obj\\compact_sub_");
 			obj_path += to_string(s + 1) + ".obj";
-			sub.model()->save_file(obj_path.c_str(), "obj");
+			sub.model()->save_file(obj_path.c_str());
+
+			std::string obj_split_path("..\\model\\gear\\obj\\compact_split_sub_");
+			obj_split_path += to_string(s + 1) + ".obj";
+			double xlimit = std::numeric_limits<double>::max();
+			coeff *= 0.1;
+			sub.model()->save_file(obj_split_path.c_str(), true, coeff, xlimit, 0);
 			/** save model to .sat file **/
 			ENTITY_LIST sublist_1;
 			sub.model()->acis_wire(sublist_1);
@@ -261,4 +288,30 @@ void print_jacobian(const char* filepath, const std::vector<double>& jaco_vec) {
 	}
 	fs.close();
 	std::cout << filepath << " is saved successfully..." << std::endl;
+}
+
+
+void test_mechanicalpart() {
+	using namespace hex_subdiv;
+	acis_mgr acis("booleans");
+	hs_model hex_model;
+	hs_example hex_example;
+	ENTITY_LIST mp_list;
+	hex_example.mechanicalpart(hex_model, mp_list);
+	acis.save_sat_file("..\\model\\mechpart\\sat\\mp_model.sat", mp_list);
+	ENTITY_LIST init_mesh;
+	hex_model.acis_wire(init_mesh);
+	acis.save_sat_file("..\\model\\mechpart\\sat\\init_mesh.sat", init_mesh);
+
+	hex_model.check_edge();
+	hex_model.check_face(); 
+
+	hs_subdiv sub(&hex_model);
+	sub.inter_subdiv();
+	sub.inter_subdiv();
+	sub.laplacian_smoothing_adaptive(); 
+	ENTITY_LIST sub_1;
+	sub.model()->acis_wire(sub_1);
+	sub_1.add(mp_list);
+	acis.save_sat_file("..\\model\\mechpart\\sat\\sub_1.sat", sub_1);
 }

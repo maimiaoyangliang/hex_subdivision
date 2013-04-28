@@ -7,6 +7,8 @@
 
 class FACE;
 class EDGE;
+class SHELL;
+class LOOP;
 class VERTEX;
 class COEDGE;
 class ENTITY;
@@ -18,6 +20,7 @@ namespace hex_subdiv {
 
 	class hs_example {
 	public:
+		void mechanicalpart(hs_model&, ENTITY_LIST&);
 		void cylinder_4(hs_model&, ENTITY_LIST&);
 		void cylinder_6(hs_model&, ENTITY_LIST&);
 		void gear_coarse(ENTITY_LIST&, hs_model&, const char* );
@@ -48,6 +51,9 @@ namespace hex_subdiv {
 		void add_edges_to_model_compact(hs_model&, std::vector< FACE* >&, std::vector< VERTEX* >&, size_t);
 		void add_faces_to_model_compact(hs_model&, std::vector< FACE* >&, std::vector< VERTEX* >&, size_t);
 		void add_cells_to_model_compact(hs_model&, size_t);
+
+		FACE* face_at(SHELL*, int);
+		EDGE* edge_at(LOOP*, int);
 	};
 
 } // namespace
