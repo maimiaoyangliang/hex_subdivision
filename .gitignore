@@ -1,5 +1,5 @@
 #ignore some files
 mmgr.log
-HexSubdWithACIS/model/ 
+HexSubdWithACIS/model 
 HexSubdWithACIS/vc60/Debug/
 
