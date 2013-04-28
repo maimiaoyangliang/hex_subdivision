@@ -203,11 +203,7 @@ void hs_model::add_vert(const hs_point& pos, vert_type vtype) {
 	vertices.push_back(hex_vert);
 }
 
-void hs_model::add_edge(size_t sp
-						, size_t ep
-						, EDGE* spa_edge
-						, edge_type etype
-						) {
+void hs_model::add_edge(size_t sp, size_t ep, EDGE* spa_edge, edge_type etype) {
 	
 	hs_edge hex_edge;
 	hex_edge.set_start_vert(sp);
@@ -222,11 +218,7 @@ void hs_model::add_edge(size_t sp
 }
 
 
-void hs_model::add_face_by_edges(const size_t edge_idx[]
-								 , size_t esize
-								 , FACE* spa_face
-								 , face_type ftype
-								 ) 
+void hs_model::add_face_by_edges(const size_t edge_idx[], size_t esize, FACE* spa_face, face_type ftype) 
 {
 	hs_face hex_face;
 	hex_face.set_type(ftype);
